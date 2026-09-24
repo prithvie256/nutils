@@ -1,0 +1,389 @@
+#!/usr/bin/env bash
+
+clear
+
+if ! sudo -n true &>/dev/null; then
+  sudo -p $'\033[34mEnter your [sudo] password: \033[0m' -v
+  echo
+fi
+
+yellow() {
+  echo -e "\033[33m$1\033[0m"
+}
+
+green() {
+  echo -e "\033[32m$1\033[0m"
+}
+
+selfdir="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
+
+essentials=(
+  "base" "bash" "base-devel" "cmake" "cachyos-hooks" "cachyos-keyring"
+  "cachyos-mirrorlist" "cachyos-settings" "cachyos-v3-mirrorlist" "cachyos-v4-mirrorlist" "device-mapper"
+  "diffutils" "dosfstools" "e2fsprogs" "efibootmgr" "exfatprogs" "xfsprogs"
+  "inetutils" "intel-ucode" "iwd" "less" "linux-cachyos" "linux-cachyos-headers"
+  "linux-firmware" "mkinitcpio" "networkmanager" "nvidia-utils" "python"
+  "sof-firmware" "sudo" "systemd-boot-manager" "usbutils"
+  "which" "pipewire" "pipewire-alsa" "pipewire-pulse" "wireplumber" "libva-nvidia-driver"
+  "lib32-nvidia-utils" "lib32-vulkan-icd-loader" "vulkan-icd-loader" "vulkan-intel"
+  "egl-wayland" "logrotate" "gst-plugin-va" "lib32-opencl-nvidia" "opencl-nvidia"
+  "linux-cachyos-nvidia-open" "7zip" "perl" "texinfo" "lsb-release" "cryptsetup"
+  "dnsmasq" "wpa_supplicant" "glfw" "xdg-desktop-portal" "xdg-desktop-portal-gnome"
+  "qt6-wayland" "qt5-wayland"
+)
+
+packages=(
+  "niri" "ly" "foot" "paru" "tree" "gdu" "fzf"
+  "fd" "progress" "wl-clipboard" "bat"
+  "bluetuith-bin" "cachyos-downgrade-git"
+  "ttf-jetbrains-mono-nerd" "noto-fonts-emoji" "noto-fonts-cjk"
+  "brightnessctl" "grim" "slurp" "swappy" "nwg-look"
+  "distrobox" "podman" "tmux"
+  "p7zip" "aria2"
+  "xorg-xwayland" "xwayland-satellite"
+  "helix"
+  "godot"
+  "fastfetch"
+  "steam"
+  "heimdall" "android-tools"
+  "tailscale" "openssh" "scrcpy"
+  "fsel-bin" "clifm-bin" "zen-browser-bin"
+  "bibata-cursor-theme-bin"
+  "clin-rs-bin"
+  "wiiudownloader-bin"
+  "flips" "mame-tools"
+  "nodejs" "npm"
+)
+
+games=(
+  "srb2-bin" "ringracers" "xonotic"
+  "osu-lazer-bin"
+)
+
+nrun_deps=(
+  "fuse2" "openssl-1.1" "dotnet-sdk-bin"
+  "mame" "mgba-qt" "snes9x-gtk" "simple64" "dolphin-emu" "melonds"
+  "azahar-appimage-wayland" "cemu-bin" "eden-bin"
+  "flycast-bin" "duckstation-preview-latest-bin"
+  "pcsx2-latest-bin" "ppsspp" "uzdoom-bin" "dhewm3" "ironwail" "yamagi-quake2"
+  "quake3e-git" "umu-launcher"
+)
+
+nmusic_deps=(
+  "yt-dlp" "mpv"
+)
+
+whitelist=(
+  "${essentials[@]}" "${packages[@]}" "${games[@]}" "${nrun_deps[@]}" "${nmusic_deps[@]}"
+)
+
+yellow "Installing packages..."
+to_install=$(pacman -T "${whitelist[@]}")
+[[ -n "$to_install" ]] && paru -S --noconfirm --needed $to_install &>/dev/null
+
+to_purge=$(comm -23 <(pacman -Qqe | sort) <(printf "%s\n" "${whitelist[@]}" | sort))
+
+if [[ -n "$to_purge" ]]; then
+  echo
+  yellow "Purging unwhitelisted packages..."
+  sudo pacman -Rns --noconfirm $to_purge &>/dev/null
+fi
+
+echo
+yellow "Updating system..."
+sudo pacman -Syu --noconfirm &>/dev/null
+
+echo
+yellow "Removing orphaned packages..."
+sudo pacman -Rns --noconfirm $(pacman -Qdtq) &>/dev/null
+
+echo
+yellow "Creating clean configurations..."
+mkdir -p ~/.config/{niri,fsel,foot,helix,clin}
+mkdir -p ~/.config/clifm/profiles/default
+mkdir -p ~/.config/helix/themes
+mkdir -p ~/.config/environment.d
+
+cat << 'EOF' | sudo tee /etc/environment > /dev/null
+QT_QPA_PLATFORMTHEME=gtk3
+EOF
+
+cat << 'EOF' >  ~/.config/niri/config.kdl
+prefer-no-csd
+
+layout {
+  gaps 10
+  background-color "1c1c21"
+
+  focus-ring {
+    off
+  }
+
+  border {
+    off
+  }
+  shadow {
+    on
+  }
+}
+
+overview {
+  backdrop-color "16161a"
+}
+
+window-rule {
+  open-maximized true
+}
+
+cursor {
+  xcursor-theme "Bibata-Modern-Classic"
+  xcursor-size 24
+}
+
+input {
+  keyboard {
+    repeat-delay 250
+    repeat-rate 40
+  }
+}
+
+binds {
+  "Super+Up" { focus-workspace-up; }
+  "Super+Down" { focus-workspace-down; }
+  "Super+Left" { focus-column-left; }
+  "Super+Right" { focus-column-right; }
+
+  "Super+w" { toggle-overview; }
+  "Super+e" { spawn "foot" "bash" "-ic" "clifm"; }
+  "Super+s" { spawn "sh" "-c" "grim  - | swappy -f -"; }
+  "Super+Shift+s" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -"; }
+  "Super+f" { fullscreen-window; }
+  "Super+v" { toggle-window-floating; }
+  "Super+a" { maximize-column; }
+  "Super+t" { spawn "foot"; }
+  "Super+Shift+t" { spawn "foot" "--app-id=float"; }
+  "Super+d" { spawn "foot" "--app-id=float" "fsel" "-d"; }
+  "Super+r" { spawn "foot" "clin"; }
+  "Super+q" { close-window; }
+  
+  "Super+Shift+q" { quit; }
+  "Super+Shift+d" { spawn "foot" "--app-id=float" "bash" "-ic" "nrun"; }
+  "Super+Shift+w" { spawn "foot" "bash" "-ic" "nmusic"; }
+
+  XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+  XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+  XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+
+  XF86MonBrightnessUp { spawn "brightnessctl" "set" "+10%"; }
+  XF86MonBrightnessDown { spawn "brightnessctl" "set" "10%-"; }
+}
+
+window-rule {
+  match app-id="float"
+  open-floating true
+}
+
+window-rule {
+  geometry-corner-radius 12
+  clip-to-geometry true
+}
+
+gestures {
+  hot-corners {
+    off
+  }
+}
+EOF
+
+cat << 'EOF' > ~/.config/fsel/config.toml
+main_text_color = "#505050"
+apps_text_color = "#505050"
+input_text_color = "#505050"
+
+main_border_color = "#505050"
+apps_border_color = "#505050"
+input_border_color = "#505050"
+
+header_title_color = "#505050"
+
+terminal_launcher = "foot"
+EOF
+
+cat << 'EOF' > ~/.config/foot/foot.ini
+[main]
+font=JetBrainsMono Nerd Font:size=12
+pad=5x0 center
+
+[colors-dark]
+foreground=e0e0e0
+background=141419
+EOF
+
+cat << 'EOF' > ~/.config/helix/config.toml
+theme = "main"
+
+[editor.gutters]
+layout = ["line-numbers", "spacer", "spacer"]
+
+[editor.gutters.line-numbers]
+min-width = 1
+EOF
+
+cat << 'EOF' > ~/.config/helix/themes/main.toml
+inherits = "base16_terminal"
+
+"ui.linenr" = { bg = "default" }
+"ui.linenr.selected" = { bg = "default" }
+
+"ui.gutter" = { bg = "default" }
+"ui.gutter.selected" = { bg = "default" }
+EOF
+
+cat << 'EOF' > ~/.bashrc
+[[ $- != *i* ]] && return
+
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias hx="helix"
+
+PS1='\[\e[1;32m\][\u@\h \W]\$\[\e[0m\] '
+
+EOF
+
+cat << EOF >> ~/.bashrc
+export PATH="$selfdir:\$PATH"
+alias ng="cd $HOME/gaming"
+EOF
+
+cat << EOF > ~/.config/clifm/profiles/default/clifmrc
+ShowHiddenFiles=last
+FuzzyMatching=true
+
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias hx="helix"
+alias ng="cd $HOME/gaming"
+EOF
+
+cat << 'EOF' > ~/.config/clin/config.toml
+storage_path = "~/notes"
+mouse_enabled = true
+auto_refresh = true
+syntax_highlighting = true
+confirm_on_quit = false
+keybind_preset = "default"
+
+[ui]
+theme = "default"
+background = "transparent"
+icon_mode = "nerd"
+hint_bar_style = "classic"
+show_status_bar = true
+
+[list]
+preview_enabled = true
+preview_position = "right"
+preview_width_ratio = 0.43
+density = "compact"
+default_view = "grid"
+show_date_in_list = true
+date_format = "%Y-%m-%d"
+pinned_on_top = true
+calendar_enabled = false
+
+[editor]
+external_enabled = true
+external_command = "helix"
+
+[graf.visual]
+graph_background = "transparent"
+EOF
+
+echo
+yellow "Setting up permissions..."
+sudo chown $USER:$USER "$0"
+sudo chmod +x "$selfdir"/*
+sudo chown -R $USER:$USER ~
+
+echo
+yellow "Setting up services..."
+sudo systemctl disable getty@tty2.service &>/dev/null
+sudo systemctl enable --now ly@tty2.service &>/dev/null
+
+echo
+yellow "Configuring audio..."
+mkdir -p ~/.config/wireplumber/wireplumber.conf.d
+
+cat << 'EOF' > ~/.config/wireplumber/wireplumber.conf.d/disable-jabra-mic.conf
+monitor.alsa.rules = [
+  {
+    matches = [
+      {
+        node.name = "alsa_input.usb-0b0e_Jabra_Evolve2_65_50C2ED3696BB-00.mono-fallback"
+      }
+    ]
+    actions = {
+      update-props = {
+        node.disabled = true
+      }
+    }
+  }
+]
+EOF
+
+echo
+yellow "Cleaning up directories..."
+rm -rf ~/{Desktop,Documents,Music,Pictures,Projects,Public,Templates,Videos}
+
+echo
+yellow "Setting up Tailscale..."
+sudo systemctl enable --now sshd &>/dev/null
+sudo systemctl enable --now tailscaled &>/dev/null
+
+echo
+yellow "Setting up Bluetooth..."
+sudo systemctl enable --now bluetooth &>/dev/null
+
+echo
+yellow "Clearing cache..."
+rm -rf ~/.cache
+sudo rm -rf /var/cache/pacman
+
+echo
+yellow "Excluding problematic packages from being updated..."
+cat << 'EOF' | sudo tee /etc/pacman.conf > /dev/null
+[options]
+IgnorePkg = linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open
+HoldPkg = pacman glibc
+Architecture = auto
+Color
+ILoveCandy
+VerbosePkgLists
+DisableDownloadTimeout
+ParallelDownloads = 10
+DownloadUser = alpm
+SigLevel = Required DatabaseOptional
+LocalFileSigLevel = Optional
+
+[cachyos-v3]
+Include = /etc/pacman.d/cachyos-v3-mirrorlist
+
+[cachyos-extra-v3]
+Include = /etc/pacman.d/cachyos-v3-mirrorlist
+
+[cachyos-core-v3]
+Include = /etc/pacman.d/cachyos-v3-mirrorlist
+
+[core]
+Include = /etc/pacman.d/mirrorlist
+
+[extra]
+Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+EOF
+
+echo
+green "Done!"
+echo

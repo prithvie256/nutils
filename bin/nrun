@@ -1,0 +1,675 @@
+#!/usr/bin/env bash
+
+shopt -s nullglob
+[[ -t 1 ]] && clear
+
+root="$HOME/gaming"
+
+wine_prefix="$root/environments/proton"
+
+emulators_folder="$root/emulators"
+
+mame="$emulators_folder/mame"
+
+mesen="$emulators_folder/mesen"
+mesen_exe="$mesen/mesen"
+
+jgenesis="$emulators_folder/jgenesis"
+jgenesis_exe="$jgenesis/jgenesis.AppImage"
+
+eden="$emulators_folder/eden"
+
+games_folder="$root/games"
+
+desktop="/usr/share/applications"
+native="$games_folder/native"
+steam="$HOME/.steam/steam/steamapps"
+windows="$games_folder/windows"
+doom="$games_folder/ports/doom"
+doom3="$games_folder/ports/doom3"
+quake="$games_folder/ports/quake"
+quake2="$games_folder/ports/quake2"
+quake3="$games_folder/ports/quake3"
+arcade="$games_folder/emulated/arcade"
+nes="$games_folder/emulated/nes"
+gb="$games_folder/emulated/gb"
+snes="$games_folder/emulated/snes"
+n64="$games_folder/emulated/n64"
+gbc="$games_folder/emulated/gbc"
+gba="$games_folder/emulated/gba"
+gc="$games_folder/emulated/gc"
+nds="$games_folder/emulated/nds"
+wii="$games_folder/emulated/wii"
+n3ds="$games_folder/emulated/3ds"
+wiiu="$games_folder/emulated/wiiu"
+switch="$games_folder/emulated/switch"
+genesis="$games_folder/emulated/genesis"
+dreamcast="$games_folder/emulated/dreamcast"
+ps1="$games_folder/emulated/ps1"
+ps2="$games_folder/emulated/ps2"
+psp="$games_folder/emulated/psp"
+
+folders=(
+  "$eden/updates"
+  "$eden/dlcs"
+  "$native"
+  "$windows"
+  "$doom/iwads"
+  "$doom/pwads"
+)
+
+folder_games=(
+  "$doom3"
+  "$quake"
+  "$quake2"
+  "$quake3"
+)
+
+special_games=(
+  "$arcade"
+)
+
+emu_games_patch=(
+  "$nes"
+  "$gb"
+  "$snes"
+  "$n64"
+  "$gbc"
+  "$gba"
+  "$gc"
+  "$nds"
+  "$wii"
+  "$n3ds"
+  "$genesis"
+  "$dreamcast"
+  "$ps1"
+  "$ps2"
+  "$psp"
+)
+
+emu_games=(
+  "$emu_games_patch"
+  "$wiiu"
+  "$switch"
+)
+
+for d in "${folder_games[@]}" "${special_games[@]}"; do
+  folders+=("$d")
+done
+
+for d in "${emu_games_patch[@]}"; do
+  folders+=("$d"/roms "$d"/hacks)
+done
+
+desktop_blacklist=(
+  "steam"
+  "uzdoom"
+  "dhewm3"
+  "ironwail"
+  "quake"
+  "simple64"
+  "flycast"
+  "glx"
+  "uri"
+)
+
+target=""
+pick=0
+
+gpu_vars=(
+  __NV_PRIME_RENDER_OFFLOAD=1
+  __GLX_VENDOR_LIBRARY_NAME=nvidia
+  __VK_LAYER_NV_optimus=NVIDIA_only
+)
+
+sudo_check() {
+  if ! sudo -n true &>/dev/null; then
+    "$@"
+    [[ "$@" ]] && sleep 1
+    sudo -p $'\033[34mEnter your [sudo] password: \033[0m' -v
+    echo
+  fi
+}
+
+yellow() {
+  echo -e "\033[33m$1\033[0m"
+}
+
+green() {
+  echo -e "\033[32m$1\033[0m"
+}
+
+detach() {
+  if [[ "$pick" == 0 ]]; then
+    setsid -f env "${gpu_vars[@]}" "$@"
+  else
+    setsid -f env "${gpu_vars[@]}" "$@" &>/dev/null
+  fi
+}
+
+nerdling_run() {    
+  if [[ ! -f "$1" ]] && command -v "$1" &>/dev/null; then
+    detach sh -c "$@"
+    sleep 0.1
+    return
+  elif [[ "$1" =~ ^[0-9]+$ ]]; then
+    detach steam -silent -applaunch "$@"
+    sleep 0.1
+    return
+  fi
+
+  case "$1" in
+    doom3)
+      shift
+      detach dhewm3 +set fs_basepath "$doom3" +set fs_game "$@"
+      return
+      ;;
+      
+    quake)
+      shift
+      detach ironwail -basedir "$quake" -game "$@"
+      return
+      ;;
+      
+    quake2)
+      shift
+      detach yamagi-quake2 -datadir "$quake2" +set game "$@"
+      return
+      ;;
+      
+    quake3)
+      shift
+      detach quake3e +set fs_basepath "$quake3" +set fs_game "$@"
+      return
+      ;;
+      
+    arcade)
+      shift
+      detach mame -rompath "$arcade;$mame/bios" "$@"
+      return
+  esac
+
+  file="$(realpath "$1" 2>/dev/null)"
+  shift
+  [[ -z "$file" ]] && return
+  cd "$(dirname "$file")" || return
+  
+  case "$file" in
+    "$windows"/*|*.exe)
+      mkdir -p "$wine_prefix"
+      detach env WINEPREFIX="$wine_prefix" umu-run "$file" "$@"
+      yellow "Please wait for 2 seconds because UMU Launcher is firing up!"
+      sleep 2
+      ;;
+      
+    "$doom/iwads"/*)
+      mod_args=()
+      
+      for mod in "$@"; do
+        mod_args+=("-file" "$mod")
+      done
+      
+      detach uzdoom -iwad "$file" "${mod_args[@]}" +set queryiwad false
+      sleep 0.1
+      ;;
+
+    "$nes"/*)
+      detach "$mesen_exe" --fullscreen "$file" "$@"
+      ;;
+
+    "$gb"/*|"$gbc"/*|"$gba"/*)
+      detach mgba-qt -f "$file" "$@"
+      ;;
+  
+    "$snes"/*)
+      detach snes9x-gtk -fullscreen "$file" "$@"
+      ;;
+
+    "$n64"/*)
+      detach simple64-gui --nogui "$file" "$@"
+      ;;
+
+    "$gc"/*|"$wii"/*)
+      detach dolphin-emu -b -C Dolphin.Display.Fullscreen=True -e "$file" "$@"
+      ;;
+      
+    "$nds"/*)
+      detach melonDS -f "$file" "$@"
+      ;;
+
+    "$n3ds"/*)
+      detach azahar -b -f "$file" "$@"
+      ;;
+
+    "$wiiu"/*)
+      detach cemu -f -g "$file" "$@"
+      ;;
+
+    "$switch"/*)
+      detach eden -f -g "$file" "$@"
+      ;;
+
+    "$genesis"/*)
+      detach "$jgenesis_exe" -f "$file" --no-gui "$@"
+      ;;
+
+    "$dreamcast"/*)
+      detach flycast -config window:fullscreen=yes "$file" "$@"
+      ;;
+      
+    "$ps1"/*)
+      detach duckstation-qt -nogui -batch -fullscreen "$file" "$@"
+      ;;
+
+    "$ps2"/*)
+      detach pcsx2 -nogui -batch -fullscreen "$file" "$@"
+      ;;
+
+    "$psp"/*)
+      detach PPSSPPSDL "$file" --fullscreen "$@"
+      ;;
+             
+    *)
+      chmod +x "$file" &>/dev/null
+      detach "$file" "$@"
+  esac
+}
+
+game_entry() {
+  [[ "$2" == "relative" ]] && fd . "$1" -t f -x printf "%s\t%s\n" "{/.}" "{/.}" && return
+  fd . "$1" -t f -x printf "%s\t%s\n" "{/.}" "{}" 2>/dev/null
+}
+
+folder_list() {
+  [[ "$2" == "relative" ]] && fd . "$1" --max-depth 1 -t d -x printf "%s\t%s\n" "{/.}" "{/.}" && return
+  fd . "$1" --max-depth 1 -t d -x printf "%s\t%s\n" "{/.}" "{}"
+}
+
+game_dir_list() {
+  for dir in "$1"/*/; do
+    "$2" "$dir" | grep -q . || continue
+    printf "%s%s\t%s\n" "$(basename "$dir")" " (Folder)" "${dir%/}"
+  done
+
+  "$2" "$1" --max-depth 1
+}
+
+desktop_list() {
+  for f in /usr/share/applications/*.desktop; do
+    [[ ! -f "$f" ]] && continue
+
+    grep -q '^Categories=.*Game' "$f" 2>/dev/null || continue
+    grep -q '^Categories=.*Emulator' "$f" 2>/dev/null && continue
+      
+    name="$(grep -oP '^Name=\K.*' "$f" 2>/dev/null)"
+    lower_name="${name,,}"
+    exec="$(grep -oP '^Exec=\K[^ ]+' "$f" 2>/dev/null)"
+
+    blocked=0
+
+    for d in "${desktop_blacklist[@]}"; do
+      [[ *"$lower_name"* == *"$d"* ]] && blocked=1
+    done
+
+    [[ "$blocked" == 1 ]] && continue
+  
+    [[ -n "$name" && -n "$exec" ]] && printf "%s\t%s\n" "$name" "$exec"
+  done
+}
+
+native_exe_list() {
+  while IFS= read -r file; do
+    [[ -f "$file" && -x "$file" ]] || continue
+    
+    IFS= read -r -N 4 magic < "$file"
+    [[ "$magic" == $'\x7fELF' ]] || continue
+
+    filename="$(basename "$file")"
+    printf "%s\t%s\n" "${filename%.*}" "$file"
+  done < <(fd . "$1" "${@:2}" -t f -E "**.so*" -E "**.o*" -E "**.ko*" 2>/dev/null)
+}
+
+steam_list() {
+  for f in "$steam"/appmanifest_*.acf; do
+    installdir="$(grep -oP '"installdir"\s+"\K[^"]+' "$f" 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+
+    case "$installdir" in
+      *proton*|*sdk*|*redist*|*dedicated*|*steamvr*|*steamworks*|*editor*|*modkit*|*tools*|*soundtrack*|*runtime*)
+        continue
+    esac
+
+    name="$(grep -oP '"name"\s+"\K[^"]+' "$f" 2>/dev/null)"
+    appid="$(grep -oP '"appid"\s+"\K[^"]+' "$f" 2>/dev/null)"
+
+    [[ -n "$name" && -n "$appid" ]] && printf "%s\t%s\n" "$name" "$appid"
+  done
+}
+
+windows_exe_list() {
+  fd . "$1" "${@:2}" -e exe -x printf "%s\t%s\n" "{/.}" "{}"
+}
+
+game_entry_all() {
+  {
+    desktop_list
+    game_dir_list "$native" native_exe_list
+    steam_list
+    game_dir_list "$windows" windows_exe_list
+    game_entry "$doom/iwads"
+
+    for d in "${folder_games[@]}"; do
+      folder_list "$d" relative
+    done
+
+    for d in "${special_games[@]}"; do
+      game_entry "$d" relative
+    done
+  
+    for d in "${emu_games[@]}"; do
+      game_entry "$d"
+    done
+  }
+}
+
+platform_list_partial() {
+  {
+    echo "Windows"
+    echo "Doom"
+    echo "Doom 3"
+    echo "Quake"
+    echo "Quake 2"
+    echo "Quake 3"
+    echo "Arcade"
+    echo "NES"
+    echo "Game Boy"
+    echo "SNES"
+    echo "N64"
+    echo "GBC"
+    echo "GBA"
+    echo "GameCube"
+    echo "NDS"
+    echo "Wii"
+    echo "3DS"
+    echo "Wii U"
+    echo "Switch"
+    echo "Genesis"
+    echo "Dreamcast"
+    echo "PS1"
+    echo "PS2"
+    echo "PSP"
+  } 2>/dev/null
+}
+
+platform_list() {
+  {
+    echo "All"
+    echo "Desktop"
+    echo "Native"
+    echo "Steam"
+    platform_list_partial
+  } 2>/dev/null
+}
+
+platform_case_partial() {
+  case "$1" in
+    "Doom 3") game_dir="$doom3"; game_cmd=doom3 ;;
+    "Quake") game_dir="$quake"; game_cmd=quake ;;
+    "Quake 2") game_dir="$quake2"; game_cmd=quake2 ;;
+    "Quake 3") game_dir="$quake3"; game_cmd=quake3 ;;
+    "Arcade") game_dir="$arcade"; game_cmd=arcade ;;
+    "NES") game_dir="$nes" ;;
+    "Game Boy") game_dir="$gb" ;;
+    "SNES") game_dir="$snes" ;;
+    "N64") game_dir="$n64" ;;
+    "GBC") game_dir="$gbc" ;;
+    "GBA") game_dir="$gba" ;;
+    "GameCube") game_dir="$gc" ;;
+    "NDS") game_dir="$nds" ;;
+    "Wii") game_dir="$wii" ;;
+    "3DS") game_dir="$n3ds" ;;
+    "Wii U") game_dir="$wiiu" ;;
+    "Switch") game_dir="$switch" ;;
+    "Genesis") game_dir="$genesis" ;;
+    "Dreamcast") game_dir="$dreamcast" ;;
+    "PS1") game_dir="$ps1" ;;
+    "PS2") game_dir="$ps2" ;;
+    "PSP") game_dir="$psp"
+  esac
+}
+
+resolve_platform_type() {
+  case "$1" in
+    "NES"|"Game Boy"|"SNES"|"N64"|"GBC"|"GBA"|"GameCube"|"NDS"|"Wii"|"3DS"|"Genesis"|"Dreamcast"|"PS1"|"PS2"|"PSP")
+      game_type="$( { echo -e "ROM(s)\troms"; echo -e "Hack(s)\thacks"; } | nrun_fzf two)"
+      ;;
+
+    "Doom")
+      game_type="$( { echo -e "IWAD(s)\tiwads"; echo -e "PWAD(s)\tpwads"; } | nrun_fzf two)"
+  esac
+
+  [[ -z "$game_type" ]] && return
+}
+
+nrun_fzf() {
+  command="fzf --no-sort --border --pointer='>' --prompt='>> ' --color='hl:#505050,hl+:#4cbdfc,fg:#505050,fg+:#4cbdfc,bg+:#141419,pointer:#4cbdfc,info:#505050,spinner:#505050,query:#505050,prompt:#505050'"
+  [[ "$1" == "multi" ]] && shift && command+=" --multi"
+  [[ "$1" == "two" ]] && shift && command+=" --delimiter='\t' --with-nth=1 --accept-nth=2"
+  eval "$command 2>/dev/null"
+}
+
+game_sort() {
+  game="$( { echo -e "Random\tRandom"; { $@ | sort; }; } | nrun_fzf two)"
+}
+
+tab_clean() {
+  "$@" | awk -F'\t' '{print $1}'
+}
+
+game_nav() {
+  while true; do
+    selection="$("$1" "$2" "$3" | sort | nrun_fzf two)" || return 1
+
+    if [[ -d "$selection" ]]; then
+      game_nav "$1" "$selection" "$3" || continue
+    else
+      game="$selection"
+    fi
+  
+    return 0
+  done
+}
+
+nrun_move() {
+  files=( "$@" )
+  platform="$( { echo "Native"; platform_list_partial; } | nrun_fzf )"
+  
+  [[ -z "$platform" ]] &&  return
+  game_type=""
+  
+  case "$platform" in
+    "Native") game_dir="$native" ;;
+    "Windows") game_dir="$windows" ;;
+    "Doom") game_dir="$doom"
+  esac
+
+  platform_case_partial "$platform"
+
+  resolve_platform_type "$platform"
+
+  for file in "${files[@]}"; do
+    yellow "Moving $file to $game_dir in the $game_type folder..."
+    echo
+    mv "$file" "$game_dir/$game_type"
+  done
+
+  green "Done. Also this feature took WAY too long to implement LOL"
+  cd "$game_dir/$game_type" && exec clifm --no-restore-last-path
+}
+
+random() {
+  game="$(game_entries | shuf -n 1 | awk -F'\t' '{print $2}')"
+  echo "$game"
+}
+
+picker() {
+  printf '\e]12;#4cbdfc\e\\' >&2
+  
+  while true; do
+    platform="$(platform_list | nrun_fzf)" || break
+
+    platform_case_partial "$platform"
+    
+    case "$platform" in
+      All)
+        while true; do
+          game_entries() { game_entry_all; }
+          game_sort game_entry_all || break
+
+          case "$game" in
+            "$native"/*)
+              game_nav game_dir_list "$game" native_exe_list || continue
+              ;;
+
+            "$windows"/*)
+              game_nav game_dir_list "$game" windows_exe_list || continue
+          esac
+
+          [[ -d "$doom3/$game" ]] && nerdling_run doom3 "$game" && break 2
+          [[ -d "$quake/$game" ]] && nerdling_run quake "$game" && break 2
+          [[ -d "$quake2/$game" ]] && nerdling_run quake2 "$game" && break 2
+          [[ -d "$quake3/$game" ]] && nerdling_run quake3 "$game" && break 2
+          [[ -f "$arcade/$game.zip" ]] && nerdling_run arcade "$game" && break 2
+         
+          break
+        done
+        ;;
+        
+      Desktop)
+        game_entries() { desktop_list; }
+        game_sort desktop_list
+        ;;
+        
+      Native)
+        clear
+        yellow "Disclaimer: \nIf your native games aren't listed, play the game at least once \nOR make it an executable with chmod +x."
+
+        echo
+      
+        yellow "Press any key to continue..."; read -n 1 -s -r
+        clear
+
+        game_nav game_dir_list "$native" native_exe_list
+        ;;
+        
+      Steam)
+        game_entries() { steam_list; }
+        game_sort steam_list
+        ;;
+        
+      Windows)
+        game_nav game_dir_list "$windows" windows_exe_list
+        ;;
+        
+      Doom)
+        while true; do
+          game_entries() { game_entry "$doom/iwads"; }
+          game_sort game_entry "$doom/iwads" || break
+        
+          [[ "$game" == "Random" ]] && break
+        
+          mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | nrun_fzf multi two)" || continue
+          nerdling_run "$game" $mods
+          break 2
+        done
+        ;;
+        
+      "Doom 3"|"Quake"|"Quake 2"|"Quake 3")
+        game_entries() { folder_list "$game_dir" relative; }
+        game_sort folder_list "$game_dir" relative || continue
+        nerdling_run "$game_cmd" "$game"
+        break
+        ;;
+
+      "Arcade")
+        game_entries() { game_entry "$game_dir" relative; }
+        game_sort game_entry "$game_dir" relative || continue
+        nerdling_run "$game_cmd" "$game"
+        break
+        ;;
+        
+      *)
+        game_entries() { game_entry "$game_dir"; }
+        game_sort game_entry "$game_dir"
+    esac
+
+    [[ -z "$game" ]] && continue
+    
+    [[ "$game" == "Random" ]] && random
+  
+    target="$game"
+    break
+  done
+
+  printf '\e]112\e\\' >&2
+}
+
+if [[ -z "$1" ]]; then
+  pick=1
+  picker
+  nerdling_run "$target"
+fi
+
+case "$1" in
+  setup)
+    yellow "Setting up directories..."
+    mkdir -p "${folders[@]}"
+
+    echo
+    yellow "Setting up config..."
+    mkdir -p ~/.config/mupen64plus
+    sed -i "s/Fullscreen = False/Fullscreen = True/g" "$HOME/.config/mupen64plus/mupen64plus.cfg" &>/dev/null
+
+    echo
+    green "Setup complete!"
+    echo
+
+    exit 0
+    ;;
+    
+  platforms)
+    platform_list | tail -n +3 | tac
+    exit 0
+    ;;
+    
+  games)
+    {
+      tab_clean desktop_list
+      tab_clean game_dir_list "$native" native_exe_list
+      tab_clean steam_list
+      tab_clean game_dir_list "$windows" windows_exe_list
+      tab_clean game_entry "$doom/iwads"
+      
+      for special in "${folder_games[@]}"; do
+        tab_clean folder_list "$special"
+      done
+    
+      for special in "${special_games[@]}"; do
+        tab_clean game_entry "$special"
+      done
+    
+      for system in "${emu_games[@]}"; do
+        tab_clean game_entry "$system"
+      done
+    } | sort | tac
+    exit 0
+    ;;
+
+  move)
+    shift
+    nrun_move "$@"
+    exit 0
+    ;;
+    
+  *)
+    nerdling_run "$@"
+esac

@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+[[ -t 1 ]] && clear
+
+current_dir=$(pwd)
+
+check_for_git() {
+  if [[ ! -d "$current_dir/.git" ]]; then
+    echo "Git repo not found. Run ngit init."
+    exit 1
+  fi
+}
+
+ngit_setup() {
+  if [[ ! -f ~/.ssh/id_ed25519 ]]; then
+    echo "Welcome to the ngit setup process! You'll be asked exactly 2 questions."
+    sleep 1
+    echo
+
+    read -p $'What is your username? \n' username
+    git config --global --replace-all user.name "$username"
+    echo
+
+    read -p $'What is your email? For example, "somerandomdude@something.com" \n' email
+    git config --global --replace-all user.email "$email"
+    echo
+
+    printf "\n" | ssh-keygen -t ed25519 -C "$email" &>/dev/null
+
+    ssh_key_pub="$(cat ~/.ssh/id_ed25519.pub)"
+    echo -e "Setup complete! One more thing, and this HAS to be manual because the tool can't do it for you, go to your account's settings (GitHub or GitLab) and input: \n$ssh_key_pub"
+    echo
+    echo "Don't worry, this is your public SSH key. Also, if you want to see the key later on, just do cat ~/.ssh/id_ed25519.pub."
+    sleep 10
+  else
+    echo "ngit is already set up!"
+    sleep 1
+    clear
+  fi
+}
+
+ngit_init() {
+  echo "Folder to initialize: $current_dir"
+  echo
+
+  read -p $'Which website are you using? \n1. GitHub \n2. GitLab \n\nType the number of your choice. \n' website_choice
+  
+  case "$website_choice" in
+    1) website_choice="github" ;;
+    2) website_choice="gitlab" ;;
+    *) echo "Uhh $website_choice isn't a valid choice... try again!"; exit 1
+  esac
+
+  echo
+  read -p $'Enter your repo URL in this format: "username/repo_name" \n' repo
+  repo_full="git@${website_choice}.com:${repo}.git"
+
+  git init -b main &>/dev/null
+  git remote add origin "$repo_full" || git remote set-url origin "$repo_full"
+}
+
+case "$1" in
+  setup)
+    ngit_setup
+    exit 0
+    ;;
+
+  init)
+    ngit_init
+    exit 0
+    ;;
+
+  add)
+    check_for_git
+    git add .
+    echo "Files added!"
+    ;;
+
+  commit)
+    check_for_git
+    read -p $'Type in your commit message: \n' message
+    git commit -m "$message" >/dev/null
+    echo
+    echo "Message committed!"
+    ;;
+
+  push)
+    check_for_git
+    
+    if ! git rev-parse --abbrev-ref u &>/dev/null; then
+      git push -u origin main
+    else
+      git push >/dev/null
+    fi
+  
+    echo
+    echo "Changes pushed!"
+esac

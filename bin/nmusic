@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+trap 'clear; printf "\e]112\e\\"; exit 130' INT
+
+root="$HOME/music"
+
+folder_list="$(printf "%s\t%s\n" "All" "$root"; fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
+
+mkdir -p "$root"
+
+yellow() {
+  echo -e "\033[33m$1\033[0m"
+}
+
+green() {
+  echo -e "\033[32m$1\033[0m"
+}
+
+pink() {
+  echo -e "\033[38;5;13m$1\033[0m"
+}
+
+download() {
+  yellow "Downloading... (this will take some time if it's a playlist ((especially a big one)), so go do something to kill time!)"
+  echo
+
+  playlist="$(yt-dlp --flat-playlist --print "%(title)s|%(webpage_url)s" "$2" 2>/dev/null)"
+  mapfile -t files < <(fd . "$root" -e mp3)
+  
+  echo "$playlist" | while IFS='|' read -r song url; do
+    found=0
+    
+    for file in "${files[@]}"; do
+      filename="$(basename "$file")"
+
+      alt_slash="$(printf '\u29f8')"
+      safe_song="${song//\//$alt_slash}"
+      
+      if [[ "$filename" == "$safe_song.mp3" ]]; then
+        pink "$song already exists!"
+        echo
+        found=1
+        break
+      fi
+    done
+  
+    if [[ "$found" == 0 ]]; then
+      yellow "Downloading $song"
+      echo
+      yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$root/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
+    fi
+  done
+
+  green "Done!"
+  echo
+}
+
+nerdling_music() {
+  if [[ -d "$1" ]]; then
+    read -p "Shuffle? [y/n] " ans
+    echo
+    
+    if [[ "$ans" == "y" || -z "$ans" ]]; then
+      nmusic_mpv shuffle "$1"
+      return
+    else
+      nmusic_mpv "$1"
+      return
+    fi
+  fi
+
+  if [[ -f "$1" ]]; then
+    nmusic_mpv "$1" --input-conf=<(echo "> quit 10") &
+    wait $!
+    nmusic_mpv shuffle "$(dirname "$1")"
+  fi
+}
+
+music_entry_fzf() {
+  fd . "$1" -e mp3 -x printf "%s\t%s\n" "{/.}" "{}" | sort
+}
+
+nmusic_fzf() {
+  cmd=(
+    --border
+    --pointer='>'
+    --prompt='>> '
+    --color='hl:#505050,hl+:#4cbdfc,fg:#505050,fg+:#4cbdfc,bg+:#141419,pointer:#4cbdfc,info:#505050,spinner:#505050,query:#505050,prompt:#505050'
+  )
+  
+  [[ "$1" == "two" ]] && cmd+=( --delimiter=$'\t' --with-nth=1 --accept-nth=2)
+  fzf "${cmd[@]}" 2>/dev/null
+}
+
+nmusic_mpv() {
+  shuffle=""
+  [[ "$1" == "shuffle" ]] && { shuffle="--shuffle"; shift; }
+  mpv --msg-level=cplayer=warn --term-status-msg='Playing: ${filename} [${percent-pos}%]' $shuffle "$@"
+}
+
+picker() {
+  printf '\e]12;#4cbdfc\e\\' >&2
+
+  while true; do
+    clear
+    folder="$(echo "$folder_list" | nmusic_fzf two)"
+  
+    [[ -z "$folder" ]] && break
+
+    song_list="$(printf "%s\t%s\n" "Play All" "$folder"; music_entry_fzf "$folder")"
+    selected="$(echo "$song_list" | nmusic_fzf two)"
+
+    [[ -z "$selected" ]] && continue
+
+    nerdling_music "$selected"
+  done
+
+  printf '\e]112\e\\' >&2
+}
+
+if [[ -z "$1" ]]; then
+  picker
+  exit 0
+fi
+
+case "$1" in
+  download)
+    download "$@"
+    ;;
+  list)
+    fd . "$root" -e mp3 -x printf "%s\n" "{/.}"
+    ;;
+  *)
+    nerdling_music "$@"
+esac
