@@ -7,6 +7,7 @@ current_dir=$(pwd)
 check_for_git() {
   if [[ ! -d "$current_dir/.git" ]]; then
     echo "Git repo not found. Run ngit init."
+    echo
     exit 1
   fi
 }
@@ -39,24 +40,32 @@ ngit_setup() {
   fi
 }
 
+remote() {
+  git remote add "$1" "git@${1}.com:${2}.git" || git remote set-url "$1" "git@${1}.com:${2}.git"
+}
+
 ngit_init() {
   echo "Folder to initialize: $current_dir"
   echo
 
-  read -p $'Which website are you using? \n1. GitHub \n2. GitLab \n\nType the number of your choice. \n' website_choice
-  
-  case "$website_choice" in
-    1) website_choice="github" ;;
-    2) website_choice="gitlab" ;;
-    *) echo "Uhh $website_choice isn't a valid choice... try again!"; exit 1
-  esac
+  read -p $'Which website are you using? \n1. GitHub \n2. GitLab \n3. Both \n\nType the number of your choice. \n' website_choice
 
   echo
   read -p $'Enter your repo URL in this format: "username/repo_name" \n' repo
-  repo_full="git@${website_choice}.com:${repo}.git"
 
   git init -b main &>/dev/null
-  git remote add origin "$repo_full" || git remote set-url origin "$repo_full"
+  
+  case "$website_choice" in
+    1) remote "github" "$repo" ;;
+    2) remote "gitlab" "$repo" ;;
+
+    3)
+      remote "github" "$repo"
+      remote "gitlab" "$repo"
+      ;;
+    
+    *) echo "Uhh $website_choice isn't a valid choice... try again!"; exit 1
+  esac
 }
 
 case "$1" in
@@ -74,25 +83,34 @@ case "$1" in
     check_for_git
     git add .
     echo "Files added!"
+    echo
     ;;
 
   commit)
     check_for_git
     read -p $'Type in your commit message: \n' message
     git commit -m "$message" >/dev/null
-    echo
     echo "Message committed!"
+    echo
     ;;
 
   push)
     check_for_git
-    
-    if ! git rev-parse --abbrev-ref u &>/dev/null; then
-      git push --quiet -u origin main >/dev/null
-    else
-      git push --quiet >/dev/null
+    remotes=($(git remote 2>/dev/null))
+
+    if [[ "${#remotes[@]}" == 0 ]]; then
+      echo "No remotes found. Run ngit init in your repo first!"
+      exit 1
     fi
+
+    for r in "${remotes[@]}"; do
+      if ! git rev-parse --abbrev-ref u &>/dev/null; then
+        git push --quiet -u "$r" main >/dev/null
+      else
+        git push --quiet "$r" >/dev/null
+      fi
+    done
   
-    echo
     echo "Changes pushed!"
+    echo
 esac

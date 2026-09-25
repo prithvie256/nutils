@@ -8,7 +8,7 @@
 
 ### nup
 
-#### nup is a clean and deterministic system manager. The way it works is just "run things in order perfectly, every time, with failsaves for any errors/null values". Currently, it manages packages, dotfiles, services and more. You can imagine it like NixOS but I like this better because it's way more raw. And yes, NixOS IS what made me make nup.
+#### nup is a clean and deterministic system manager. The way it works is just "run things in order perfectly, every time, with failsaves for any errors/null values". Currently, it manages packages, dotfiles, services and more. You can imagine it like NixOS but I like this better because it's rawer. And yes, NixOS IS what made me make nup.
 
 ### nrun
 
@@ -34,11 +34,17 @@
 
 #### nedit is yet ANOTHER tiny script that is basically ncat but for editing files with Helix, the text editor.
 
-## When Will This Toolkit Be Complete?
+## When will this toolkit be complete?
 
 #### Never. This is a toolkit that will ALWAYS be improved upon throughout its existence. No tool here is close to complete or perfect. Most are barely flexible, which is why I call it opinionated.
 
-## "Installation"
+## Are these tools in a state where they can be released to the public as actual utilities?
+
+#### Not yet. These tools are not really VERY user friendly or flexible, and as mentioned before, improvements will keep coming. Hopefully one day I can release them as actual tools, though!
+
+## Installation
 
 #### Run:
 ```git clone https://github.com/nerdling256/nutils```
+#### Or:
+```git clone https://gitlab.com/nerdling256/nutils```
