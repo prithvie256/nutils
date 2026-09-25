@@ -88,7 +88,7 @@ emu_games_patch=(
 )
 
 emu_games=(
-  "$emu_games_patch"
+  "${emu_games_patch[@]}"
   "$wiiu"
   "$switch"
 )
@@ -443,6 +443,10 @@ resolve_platform_type() {
       game_type="$( { echo -e "ROM(s)\troms"; echo -e "Hack(s)\thacks"; } | nrun_fzf two)"
       ;;
 
+    "Switch")
+      game_type="$( { echo -e "ROM(s)\t"; echo -e "Update(s)\tupdates"; echo -e "DLC(s)\tdlcs"; } | nrun_fzf two)"
+      ;;
+
     "Doom")
       game_type="$( { echo -e "IWAD(s)\tiwads"; echo -e "PWAD(s)\tpwads"; } | nrun_fzf two)"
   esac
@@ -495,6 +499,10 @@ nrun_move() {
   platform_case_partial "$platform"
 
   resolve_platform_type "$platform"
+
+  if [[ "$game_type" == "updates" || "$game_type" == "dlcs" ]]; then
+    game_dir="$eden"
+  fi
 
   for file in "${files[@]}"; do
     yellow "Moving $file to $game_dir in the $game_type folder..."

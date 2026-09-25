@@ -88,9 +88,9 @@ case "$1" in
     check_for_git
     
     if ! git rev-parse --abbrev-ref u &>/dev/null; then
-      git push -u origin main
+      git push --quiet -u origin main >/dev/null
     else
-      git push >/dev/null
+      git push --quiet >/dev/null
     fi
   
     echo
