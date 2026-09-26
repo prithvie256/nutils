@@ -32,7 +32,11 @@
 
 ### nedit
 
-#### nedit is yet ANOTHER tiny script that is basically ncat but for editing files with Helix, the text editor.
+#### nedit is basically ncat but for editing files with Helix, the text editor.
+
+### ndownload
+
+#### You know the drill, ndownload is another small script that just simplifies using aria2 to download stuff. It only exists because I'm too lazy to type "-s16 -x16" in my aria2c command.
 
 ## When will this toolkit be complete?
 
