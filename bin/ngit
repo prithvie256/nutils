@@ -104,11 +104,7 @@ case "$1" in
     fi
 
     for r in "${remotes[@]}"; do
-      if ! git rev-parse --abbrev-ref u &>/dev/null; then
-        git push --quiet -u "$r" main >/dev/null
-      else
-        git push --quiet "$r" >/dev/null
-      fi
+      git push --quiet "$r" >/dev/null
     done
   
     echo "Changes pushed!"

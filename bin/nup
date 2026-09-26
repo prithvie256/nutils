@@ -108,7 +108,7 @@ cat << 'EOF' | sudo tee /etc/environment > /dev/null
 QT_QPA_PLATFORMTHEME=gtk3
 EOF
 
-cat << 'EOF' >  ~/.config/niri/config.kdl
+cat << 'EOF' > ~/.config/niri/config.kdl
 prefer-no-csd
 
 layout {
@@ -309,6 +309,13 @@ echo
 yellow "Setting up services..."
 sudo systemctl disable getty@tty2.service &>/dev/null
 sudo systemctl enable --now ly@tty2.service &>/dev/null
+
+echo
+yellow "Setting up ZRAM..."
+cat << 'EOF' | sudo tee /etc/systemd/zram-generator.conf > /dev/null
+[zram0]
+zram-size = ram * 2
+EOF
 
 echo
 yellow "Configuring audio..."
