@@ -7,6 +7,12 @@ if ! sudo -n true &>/dev/null; then
   echo
 fi
 
+while true; do
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
+done 2>/dev/null &
+
 yellow() {
   echo -e "\033[33m$1\033[0m"
 }

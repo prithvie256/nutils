@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+mkdir -p ~/nfile
+
+"$@" > ~/nfile/out.txt
+
+echo "Created file in ~/nfile/out.txt."
+echo

@@ -650,7 +650,7 @@ case "$1" in
     ;;
     
   games)
-    {
+    games=$(
       tab_clean desktop_list
       tab_clean game_dir_list "$native" native_exe_list
       tab_clean steam_list
@@ -668,7 +668,11 @@ case "$1" in
       for system in "${emu_games[@]}"; do
         tab_clean game_entry "$system"
       done
-    } | sort | tac
+    )
+
+    echo "${games[@]}" | sort | tac
+    echo
+    echo "$(echo "${games[@]}" | wc -l)" "Games"
     exit 0
     ;;
 
