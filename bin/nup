@@ -62,11 +62,10 @@ packages=(
 )
 
 games=(
-  "srb2-bin" "ringracers" "xonotic"
   "osu-lazer-bin"
 )
 
-nrun_deps=(
+ngame_deps=(
   "fuse2" "openssl-1.1" "dotnet-sdk-bin"
   "mame" "mgba-qt" "snes9x-gtk" "simple64" "dolphin-emu" "melonds"
   "azahar-appimage-wayland" "cemu-bin" "eden-bin"
@@ -80,7 +79,7 @@ nmusic_deps=(
 )
 
 whitelist=(
-  "${essentials[@]}" "${packages[@]}" "${games[@]}" "${nrun_deps[@]}" "${nmusic_deps[@]}"
+  "${essentials[@]}" "${packages[@]}" "${games[@]}" "${ngame_deps[@]}" "${nmusic_deps[@]}"
 )
 
 yellow "Installing packages..."
@@ -173,7 +172,7 @@ binds {
   "Super+q" { close-window; }
   
   "Super+Shift+q" { quit; }
-  "Super+Shift+d" { spawn "foot" "--app-id=float" "bash" "-ic" "nrun"; }
+  "Super+Shift+d" { spawn "foot" "--app-id=float" "bash" "-ic" "ngame"; }
   "Super+Shift+w" { spawn "foot" "bash" "-ic" "nmusic"; }
 
   XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }

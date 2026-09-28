@@ -10,9 +10,9 @@
 
 #### nup is a clean and deterministic system manager. The way it works is just "run things in order perfectly every time with failsaves for any errors/null values". Currently, it manages packages, dotfiles, services and more. You can imagine it like NixOS but I like this better because it's rawer. And yes, NixOS IS what made me make nup.
 
-### nrun
+### ngame
 
-#### nrun is a multiplatform game launcher that unifies a bunch of emulators, Wine, native portable games, Steam, games installed with your package manager, Doom, Quake, and so on into a clean fzf interface. It also has additional features such as easy game moving (since it uses its own folder structure for games), game listing, platform listing, etc.
+#### ngame is a multiplatform game launcher that unifies a bunch of emulators, Wine, native portable games, Steam, games installed with your package manager, Doom, Quake, and so on into a clean fzf interface. It also has additional features such as easy game moving (since it uses its own folder structure for games), game listing, platform listing, etc.
 
 ### nmusic
 

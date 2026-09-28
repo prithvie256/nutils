@@ -440,21 +440,21 @@ platform_case_partial() {
 resolve_platform_type() {
   case "$1" in
     "NES"|"Game Boy"|"SNES"|"N64"|"GBC"|"GBA"|"GameCube"|"NDS"|"Wii"|"3DS"|"Genesis"|"Dreamcast"|"PS1"|"PS2"|"PSP")
-      game_type="$( { echo -e "ROM(s)\troms"; echo -e "Hack(s)\thacks"; } | nrun_fzf two)"
+      game_type="$( { echo -e "ROM(s)\troms"; echo -e "Hack(s)\thacks"; } | ngame_fzf two)"
       ;;
 
     "Switch")
-      game_type="$( { echo -e "ROM(s)\t"; echo -e "Update(s)\tupdates"; echo -e "DLC(s)\tdlcs"; } | nrun_fzf two)"
+      game_type="$( { echo -e "ROM(s)\t"; echo -e "Update(s)\tupdates"; echo -e "DLC(s)\tdlcs"; } | ngame_fzf two)"
       ;;
 
     "Doom")
-      game_type="$( { echo -e "IWAD(s)\tiwads"; echo -e "PWAD(s)\tpwads"; } | nrun_fzf two)"
+      game_type="$( { echo -e "IWAD(s)\tiwads"; echo -e "PWAD(s)\tpwads"; } | ngame_fzf two)"
   esac
 
   [[ -z "$game_type" ]] && return
 }
 
-nrun_fzf() {
+ngame_fzf() {
   command="fzf --no-sort --border --pointer='>' --prompt='>> ' --color='hl:#505050,hl+:#4cbdfc,fg:#505050,fg+:#4cbdfc,bg+:#141419,pointer:#4cbdfc,info:#505050,spinner:#505050,query:#505050,prompt:#505050'"
   [[ "$1" == "multi" ]] && shift && command+=" --multi"
   [[ "$1" == "two" ]] && shift && command+=" --delimiter='\t' --with-nth=1 --accept-nth=2"
@@ -462,7 +462,7 @@ nrun_fzf() {
 }
 
 game_sort() {
-  game="$( { echo -e "Random\tRandom"; { $@ | sort; }; } | nrun_fzf two)"
+  game="$( { echo -e "Random\tRandom"; { $@ | sort; }; } | ngame_fzf two)"
 }
 
 tab_clean() {
@@ -471,7 +471,7 @@ tab_clean() {
 
 game_nav() {
   while true; do
-    selection="$("$1" "$2" "$3" | sort | nrun_fzf two)" || return 1
+    selection="$("$1" "$2" "$3" | sort | ngame_fzf two)" || return 1
 
     if [[ -d "$selection" ]]; then
       game_nav "$1" "$selection" "$3" || continue
@@ -483,9 +483,9 @@ game_nav() {
   done
 }
 
-nrun_move() {
+ngame_move() {
   files=( "$@" )
-  platform="$( { echo "Native"; platform_list_partial; } | nrun_fzf )"
+  platform="$( { echo "Native"; platform_list_partial; } | ngame_fzf )"
   
   [[ -z "$platform" ]] &&  return
   game_type=""
@@ -523,7 +523,7 @@ picker() {
   printf '\e]12;#4cbdfc\e\\' >&2
   
   while true; do
-    platform="$(platform_list | nrun_fzf)" || break
+    platform="$(platform_list | ngame_fzf)" || break
 
     platform_case_partial "$platform"
     
@@ -585,7 +585,7 @@ picker() {
         
           [[ "$game" == "Random" ]] && break
         
-          mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | nrun_fzf multi two)" || continue
+           mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | _fzf multi two)" || continue
           nerdling_run "$game" $mods
           break 2
         done
@@ -649,7 +649,7 @@ case "$1" in
     exit 0
     ;;
     
-  games)
+  list)
     games=$(
       tab_clean desktop_list
       tab_clean game_dir_list "$native" native_exe_list
@@ -678,7 +678,7 @@ case "$1" in
 
   move)
     shift
-    nrun_move "$@"
+    _move  "$@"
     exit 0
     ;;
     
