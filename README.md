@@ -36,11 +36,11 @@
 
 ### ndl
 
-#### ndl is a small script that simplifies using aria2 to download stuff. It only exists because I'm too lazy to type ```-s16 -x16``` in my aria2c command.
+#### ndl is a small script that simplifies using aria2 to download stuff. It only exists because I'm too lazy to type `-s16 -x16` in my aria2c command.
 
 ### nfile
 
-#### nfile is a simple script that takes the output of a command/argument you give and makes it a .txt file. Useful for when you don't wanna append ```> [filename].txt``` every time you want to create a file out of a command's output.
+#### nfile is a simple script that takes the output of a command/argument you give and makes it a .txt file. Useful for when you don't wanna append `> [filename].txt` every time you want to create a file out of a command's output.
 
 ## When will this toolkit be complete?
 
@@ -57,12 +57,12 @@
 ## Installation & Setup
 
 #### Run:
-```git clone https://github.com/nerdling256/nutils```
+`git clone https://github.com/nerdling256/nutils.git`
 #### Or:
-```git clone https://gitlab.com/nerdling256/nutils```
+`git clone https://gitlab.com/nerdling256/nutils.git`
 
 #### Then, all you have to do is manually run the nup script once with:
-```~/nutils/bin/nup```
+`~/nutils/bin/nup`
 #### And you are done!
 
 ## Overall
