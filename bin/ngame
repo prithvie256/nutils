@@ -585,7 +585,7 @@ picker() {
         
           [[ "$game" == "Random" ]] && break
         
-           mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | _fzf multi two)" || continue
+           mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | ngame_fzf multi two)" || continue
           nerdling_run "$game" $mods
           break 2
         done
