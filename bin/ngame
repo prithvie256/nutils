@@ -3,7 +3,9 @@
 shopt -s nullglob
 [[ -t 1 ]] && clear
 
-root="$HOME/gaming"
+root="$HOME/nutils-data/ngame"
+
+mkdir -p "$root"
 
 wine_prefix="$root/environments/proton"
 
@@ -678,7 +680,7 @@ case "$1" in
 
   move)
     shift
-    _move  "$@"
+    ngame_move  "$@"
     exit 0
     ;;
     

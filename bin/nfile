@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-mkdir -p ~/nfile
+root="$HOME/nutils-data/nfile"
 
-"$@" > ~/nfile/out.txt
+mkdir -p "$root"
 
-echo "Created file in ~/nfile/out.txt."
+"$@" > "$root"/out.txt
+
+echo "Created file in ~/nutils-data/nfile/out.txt."
 echo

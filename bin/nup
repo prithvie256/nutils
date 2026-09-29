@@ -2,6 +2,10 @@
 
 clear
 
+data="$HOME/nutils-data"
+
+mkdir -p "$data"
+
 if ! sudo -n true &>/dev/null; then
   sudo -p $'\033[34mEnter your [sudo] password: \033[0m' -v
   echo
@@ -257,7 +261,7 @@ EOF
 
 cat << EOF >> ~/.bashrc
 export PATH="$selfdir:\$PATH"
-alias ng="cd $HOME/gaming"
+alias ng="cd $data/ngame"
 EOF
 
 cat << EOF > ~/.config/clifm/profiles/default/clifmrc
@@ -267,7 +271,7 @@ FuzzyMatching=true
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 alias hx="helix"
-alias ng="cd $HOME/gaming"
+alias ng="cd $data/ngame"
 EOF
 
 cat << 'EOF' > ~/.config/clin/config.toml

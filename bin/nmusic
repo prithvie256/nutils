@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-root="$HOME/music"
+root="$HOME/nutils-data/nmusic"
 
-folder_list="$(printf "%s\t%s\n" "All" "$root"; fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
+all="$root/All"
 
-mkdir -p "$root"
+mkdir -p "$all"
+
+folder_list="$(fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
 
 yellow() {
   echo -e "\033[33m$1\033[0m"
@@ -23,7 +25,7 @@ download() {
   echo
 
   playlist="$(yt-dlp --flat-playlist --print "%(title)s|%(webpage_url)s" "$2" 2>/dev/null)"
-  mapfile -t files < <(fd . "$root" -e mp3)
+  mapfile -t files < <(fd . "$all" -e mp3)
   
   echo "$playlist" | while IFS='|' read -r song url; do
     found=0
@@ -43,9 +45,9 @@ download() {
     done
   
     if [[ "$found" == 0 ]]; then
-      yellow "Downloading $song"
+      yellow "Downloading $song..."
       echo
-      yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$root/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
+      yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$all/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
     fi
   done
 
