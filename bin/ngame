@@ -115,7 +115,6 @@ desktop_blacklist=(
   "uri"
 )
 
-target=""
 pick=0
 
 gpu_vars=(
@@ -467,10 +466,6 @@ game_sort() {
   game="$( { echo -e "Random\tRandom"; { $@ | sort; }; } | ngame_fzf two)"
 }
 
-tab_clean() {
-  "$@" | awk -F'\t' '{print $1}'
-}
-
 game_nav() {
   while true; do
     selection="$("$1" "$2" "$3" | sort | ngame_fzf two)" || return 1
@@ -535,6 +530,8 @@ picker() {
           game_entries() { game_entry_all; }
           game_sort game_entry_all || break
 
+          [[ "$game" == "Random" ]] && random
+          
           case "$game" in
             "$native"/*)
               game_nav game_dir_list "$game" native_exe_list || continue
@@ -557,6 +554,7 @@ picker() {
       Desktop)
         game_entries() { desktop_list; }
         game_sort desktop_list
+        [[ "$game" == "Random" ]] && random
         ;;
         
       Native)
@@ -569,25 +567,27 @@ picker() {
         clear
 
         game_nav game_dir_list "$native" native_exe_list
+        [[ "$game" == "Random" ]] && random
         ;;
         
       Steam)
         game_entries() { steam_list; }
         game_sort steam_list
+        [[ "$game" == "Random" ]] && random
         ;;
         
       Windows)
         game_nav game_dir_list "$windows" windows_exe_list
+        [[ "$game" == "Random" ]] && random
         ;;
         
       Doom)
         while true; do
           game_entries() { game_entry "$doom/iwads"; }
           game_sort game_entry "$doom/iwads" || break
-        
           [[ "$game" == "Random" ]] && break
         
-           mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | ngame_fzf multi two)" || continue
+          mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | ngame_fzf multi two)" || continue
           nerdling_run "$game" $mods
           break 2
         done
@@ -596,6 +596,8 @@ picker() {
       "Doom 3"|"Quake"|"Quake 2"|"Quake 3")
         game_entries() { folder_list "$game_dir" relative; }
         game_sort folder_list "$game_dir" relative || continue
+        [[ "$game" == "Random" ]] && random
+        
         nerdling_run "$game_cmd" "$game"
         break
         ;;
@@ -603,6 +605,8 @@ picker() {
       "Arcade")
         game_entries() { game_entry "$game_dir" relative; }
         game_sort game_entry "$game_dir" relative || continue
+        [[ "$game" == "Random" ]] && random
+        
         nerdling_run "$game_cmd" "$game"
         break
         ;;
@@ -610,13 +614,11 @@ picker() {
       *)
         game_entries() { game_entry "$game_dir"; }
         game_sort game_entry "$game_dir"
+        [[ "$game" == "Random" ]] && random
     esac
 
     [[ -z "$game" ]] && continue
-    
-    [[ "$game" == "Random" ]] && random
   
-    target="$game"
     break
   done
 
@@ -626,7 +628,7 @@ picker() {
 if [[ -z "$1" ]]; then
   pick=1
   picker
-  nerdling_run "$target"
+  nerdling_run "$game"
 fi
 
 case "$1" in
@@ -652,25 +654,7 @@ case "$1" in
     ;;
     
   list)
-    games=$(
-      tab_clean desktop_list
-      tab_clean game_dir_list "$native" native_exe_list
-      tab_clean steam_list
-      tab_clean game_dir_list "$windows" windows_exe_list
-      tab_clean game_entry "$doom/iwads"
-      
-      for special in "${folder_games[@]}"; do
-        tab_clean folder_list "$special"
-      done
-    
-      for special in "${special_games[@]}"; do
-        tab_clean game_entry "$special"
-      done
-    
-      for system in "${emu_games[@]}"; do
-        tab_clean game_entry "$system"
-      done
-    )
+    games=$(game_entry_all | awk -F'\t' '{print $1}')
 
     echo "${games[@]}" | sort | tac
     echo
@@ -680,8 +664,14 @@ case "$1" in
 
   move)
     shift
-    ngame_move  "$@"
+    ngame_move "$@"
     exit 0
+    ;;
+
+  random)
+    game_entries() { game_entry_all; }
+    random
+    nerdling_run "$game"
     ;;
     
   *)

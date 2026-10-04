@@ -37,9 +37,9 @@ essentials=(
   "which" "pipewire" "pipewire-alsa" "pipewire-pulse" "wireplumber" "libva-nvidia-driver"
   "lib32-nvidia-utils" "lib32-vulkan-icd-loader" "vulkan-icd-loader" "vulkan-intel"
   "egl-wayland" "logrotate" "gst-plugin-va" "lib32-opencl-nvidia" "opencl-nvidia"
-  "linux-cachyos-nvidia-open" "7zip" "perl" "texinfo" "lsb-release" "cryptsetup"
+  "linux-cachyos-nvidia-open" "7zip" "perl" "texinfo" "lsb-release" "lib32-llvm-libs" "llvm-libs" "cryptsetup"
   "dnsmasq" "wpa_supplicant" "glfw" "xdg-desktop-portal" "xdg-desktop-portal-gnome"
-  "qt6-wayland" "qt5-wayland"
+  "qt6-wayland" "qt5-wayland" "vlc" "opusfile"
 )
 
 packages=(
@@ -74,7 +74,7 @@ ngame_deps=(
   "mame" "mgba-qt" "snes9x-gtk" "simple64" "dolphin-emu" "melonds"
   "azahar-appimage-wayland" "cemu-bin" "eden-bin"
   "flycast-bin" "duckstation-preview-latest-bin"
-  "pcsx2-latest-bin" "ppsspp" "uzdoom-bin" "dhewm3" "ironwail" "yamagi-quake2"
+  "pcsx2-latest-bin" "ppsspp" "uzdoom" "dhewm3" "ironwail" "yamagi-quake2"
   "quake3e-git" "umu-launcher"
 )
 
@@ -100,7 +100,7 @@ fi
 
 echo
 yellow "Updating system..."
-sudo pacman -Syu --noconfirm &>/dev/null
+paru -Syu --noconfirm &>/dev/null
 
 echo
 yellow "Removing orphaned packages..."
@@ -363,13 +363,13 @@ sudo systemctl enable --now bluetooth &>/dev/null
 echo
 yellow "Clearing cache..."
 rm -rf ~/.cache
-sudo rm -rf /var/cache/pacman
+paru -Scc --noconfirm &>/dev/null
 
 echo
 yellow "Excluding problematic packages from being updated..."
 cat << 'EOF' | sudo tee /etc/pacman.conf > /dev/null
 [options]
-IgnorePkg = linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open
+IgnorePkg = linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open llvm-libs lib32-llvm-libs
 HoldPkg = pacman glibc
 Architecture = auto
 Color
