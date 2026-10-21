@@ -7,7 +7,9 @@ root="$HOME/nutils-data/ngame"
 
 mkdir -p "$root"
 
-wine_prefix="$root/environments/proton"
+proton="$HOME/.steam/steam/steamapps/common/Proton - Experimental/proton"
+proton_env="$root/environments/proton"
+steamrt4="$HOME/.steam/steam/steamapps/common/SteamLinuxRuntime_4/run"
 
 emulators_folder="$root/emulators"
 
@@ -22,34 +24,37 @@ jgenesis_exe="$jgenesis/jgenesis.AppImage"
 eden="$emulators_folder/eden"
 
 games_folder="$root/games"
+ports="$games_folder/ports"
+emulated="$games_folder/emulated"
 
 desktop="/usr/share/applications"
 native="$games_folder/native"
 steam="$HOME/.steam/steam/steamapps"
 windows="$games_folder/windows"
-doom="$games_folder/ports/doom"
-doom3="$games_folder/ports/doom3"
-quake="$games_folder/ports/quake"
-quake2="$games_folder/ports/quake2"
-quake3="$games_folder/ports/quake3"
-arcade="$games_folder/emulated/arcade"
-nes="$games_folder/emulated/nes"
-gb="$games_folder/emulated/gb"
-snes="$games_folder/emulated/snes"
-n64="$games_folder/emulated/n64"
-gbc="$games_folder/emulated/gbc"
-gba="$games_folder/emulated/gba"
-gc="$games_folder/emulated/gc"
-nds="$games_folder/emulated/nds"
-wii="$games_folder/emulated/wii"
-n3ds="$games_folder/emulated/3ds"
-wiiu="$games_folder/emulated/wiiu"
-switch="$games_folder/emulated/switch"
-genesis="$games_folder/emulated/genesis"
-dreamcast="$games_folder/emulated/dreamcast"
-ps1="$games_folder/emulated/ps1"
-ps2="$games_folder/emulated/ps2"
-psp="$games_folder/emulated/psp"
+doom="$ports/doom"
+doom3="$ports/doom3"
+quake="$ports/quake"
+quake2="$ports/quake2"
+quake3="$ports/quake3"
+arcade="$emulated/arcade"
+nes="$emulated/nes"
+gb="$emulated/gb"
+snes="$emulated/snes"
+n64="$emulated/n64"
+gbc="$emulated/gbc"
+gba="$emulated/gba"
+gc="$emulated/gc"
+nds="$emulated/nds"
+wii="$emulated/wii"
+n3ds="$emulated/3ds"
+wiiu="$emulated/wiiu"
+switch="$emulated/switch"
+genesis="$emulated/genesis"
+dreamcast="$emulated/dreamcast"
+ps1="$emulated/ps1"
+ps2="$emulated/ps2"
+psp="$emulated/psp"
+ps3="$emulated/ps3"
 
 folders=(
   "$eden/updates"
@@ -65,6 +70,7 @@ folder_games=(
   "$quake"
   "$quake2"
   "$quake3"
+  "$ps3"
 )
 
 special_games=(
@@ -197,9 +203,8 @@ nerdling_run() {
   
   case "$file" in
     "$windows"/*|*.exe)
-      mkdir -p "$wine_prefix"
-      detach env WINEPREFIX="$wine_prefix" umu-run "$file" "$@"
-      yellow "Please wait for 2 seconds because UMU Launcher is firing up!"
+      mkdir -p "$proton_env"
+      detach env STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam" STEAM_COMPAT_DATA_PATH="$proton_env" "$steamrt4" -- "$proton" run "$file" "$@"
       sleep 2
       ;;
       
@@ -269,7 +274,11 @@ nerdling_run() {
     "$psp"/*)
       detach PPSSPPSDL "$file" --fullscreen "$@"
       ;;
-             
+
+    "$ps3"/*)
+      detach rpcs3 --fullscreen --no-gui "$file/PS3_GAME/USRDIR/EBOOT.BIN" "$@"
+      ;;
+      
     *)
       chmod +x "$file" &>/dev/null
       detach "$file" "$@"
@@ -398,6 +407,7 @@ platform_list_partial() {
     echo "PS1"
     echo "PS2"
     echo "PSP"
+    echo "PS3"
   } 2>/dev/null
 }
 
@@ -434,7 +444,8 @@ platform_case_partial() {
     "Dreamcast") game_dir="$dreamcast" ;;
     "PS1") game_dir="$ps1" ;;
     "PS2") game_dir="$ps2" ;;
-    "PSP") game_dir="$psp"
+    "PSP") game_dir="$psp" ;;
+    "PS3") game_dir="$ps3" ;;
   esac
 }
 
@@ -456,10 +467,16 @@ resolve_platform_type() {
 }
 
 ngame_fzf() {
-  command="fzf --no-sort --border --pointer='>' --prompt='>> ' --color='hl:#505050,hl+:#4cbdfc,fg:#505050,fg+:#4cbdfc,bg+:#141419,pointer:#4cbdfc,info:#505050,spinner:#505050,query:#505050,prompt:#505050'"
-  [[ "$1" == "multi" ]] && shift && command+=" --multi"
-  [[ "$1" == "two" ]] && shift && command+=" --delimiter='\t' --with-nth=1 --accept-nth=2"
-  eval "$command 2>/dev/null"
+  cmd=(
+    --border
+    --pointer='>'
+    --prompt='>> '
+    --color='hl:#505050,hl+:#4cbdfc,fg:#505050,fg+:#4cbdfc,bg+:#141419,pointer:#4cbdfc,info:#505050,spinner:#505050,query:#505050,prompt:#505050'
+  )
+
+  [[ "$1" == "multi" ]] && shift && cmd+=( --multi)
+  [[ "$1" == "two" ]] && cmd+=( --delimiter=$'\t' --with-nth=1 --accept-nth=2)
+  fzf "${cmd[@]}" 2>/dev/null
 }
 
 game_sort() {
@@ -609,6 +626,12 @@ picker() {
         
         nerdling_run "$game_cmd" "$game"
         break
+        ;;
+
+      "PS3")
+        game_entries() { folder_list "$game_dir"; }
+        game_sort folder_list "$game_dir" || continue
+        [[ "$game" == "Random" ]] && random
         ;;
         
       *)

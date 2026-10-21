@@ -63,6 +63,8 @@ packages=(
   "wiiudownloader-bin"
   "flips" "mame-tools"
   "nodejs" "npm"
+  "rtorrent"
+  "flatpak" "auto_sober"
 )
 
 games=(
@@ -74,8 +76,8 @@ ngame_deps=(
   "mame" "mgba-qt" "snes9x-gtk" "simple64" "dolphin-emu" "melonds"
   "azahar-appimage-wayland" "cemu-bin" "eden-bin"
   "flycast-bin" "duckstation-preview-latest-bin"
-  "pcsx2-latest-bin" "ppsspp" "uzdoom" "dhewm3" "ironwail" "yamagi-quake2"
-  "quake3e-git" "umu-launcher"
+  "pcsx2" "ppsspp" "rpcs3-bin" "uzdoom" "dhewm3" "ironwail" "yamagi-quake2"
+  "quake3e-git"
 )
 
 nmusic_deps=(
@@ -88,7 +90,8 @@ whitelist=(
 
 yellow "Installing packages..."
 to_install=$(pacman -T "${whitelist[@]}")
-[[ -n "$to_install" ]] && paru -S --noconfirm --needed $to_install &>/dev/null
+echo
+[[ -n "$to_install" ]] && paru -S --noconfirm --needed $to_install #&>/dev/null
 
 to_purge=$(comm -23 <(pacman -Qqe | sort) <(printf "%s\n" "${whitelist[@]}" | sort))
 
@@ -100,7 +103,8 @@ fi
 
 echo
 yellow "Updating system..."
-paru -Syu --noconfirm &>/dev/null
+echo
+paru -Syu --noconfirm #&>/dev/null
 
 echo
 yellow "Removing orphaned packages..."
@@ -165,19 +169,20 @@ binds {
   "Super+w" { toggle-overview; }
   "Super+e" { spawn "foot" "bash" "-ic" "clifm"; }
   "Super+s" { spawn "sh" "-c" "grim  - | swappy -f -"; }
-  "Super+Shift+s" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -"; }
   "Super+f" { fullscreen-window; }
   "Super+v" { toggle-window-floating; }
   "Super+a" { maximize-column; }
   "Super+t" { spawn "foot"; }
-  "Super+Shift+t" { spawn "foot" "--app-id=float"; }
   "Super+d" { spawn "foot" "--app-id=float" "fsel" "-d"; }
   "Super+r" { spawn "foot" "clin"; }
   "Super+q" { close-window; }
   
-  "Super+Shift+q" { quit; }
+  "Super+Shift+e" { spawn "foot" "bash" "-ic" "nmusic"; }
+  "Super+Shift+s" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -"; }
   "Super+Shift+d" { spawn "foot" "--app-id=float" "bash" "-ic" "ngame"; }
-  "Super+Shift+w" { spawn "foot" "bash" "-ic" "nmusic"; }
+  "Super+Shift+t" { spawn "foot" "--app-id=float"; }
+  "Super+Shift+w" { spawn "foot" "bash" "-ic" "opencode"; }
+  "Super+Shift+q" { quit; }
 
   XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
   XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
@@ -254,14 +259,18 @@ cat << 'EOF' > ~/.bashrc
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 alias hx="helix"
+alias nbrowse="zen-browser"
 
 PS1='\[\e[1;32m\][\u@\h \W]\$\[\e[0m\] '
 
 EOF
 
 cat << EOF >> ~/.bashrc
-export PATH="$selfdir:\$PATH"
+export PATH="$selfdir:$HOME/.opencode/bin:$PATH"
+alias nd="cd $data"
 alias ng="cd $data/ngame"
+alias nf="cd $data/nfile"
+alias nm="cd $data/nmusic"
 EOF
 
 cat << EOF > ~/.config/clifm/profiles/default/clifmrc
@@ -271,7 +280,11 @@ FuzzyMatching=true
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 alias hx="helix"
+alias nbrowse="zen-browser"
+alias nd="cd $data"
 alias ng="cd $data/ngame"
+alias nf="cd $data/nfile"
+alias nm="cd $data/nmusic"
 EOF
 
 cat << 'EOF' > ~/.config/clin/config.toml
@@ -369,9 +382,9 @@ echo
 yellow "Excluding problematic packages from being updated..."
 cat << 'EOF' | sudo tee /etc/pacman.conf > /dev/null
 [options]
-IgnorePkg = linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open llvm-libs lib32-llvm-libs
+IgnorePkg = linux-cachyos linux-cachyos-headers linux-cachyos-nvidia-open nvidia-utils lib32-nvidia-utils opencl-nvidia lib32-opencl-nvidia
 HoldPkg = pacman glibc
-Architecture = auto
+Architecture = x86_64 x86_64_v3
 Color
 ILoveCandy
 VerbosePkgLists

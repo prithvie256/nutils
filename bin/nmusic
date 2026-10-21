@@ -70,8 +70,8 @@ nerdling_music() {
   fi
 
   if [[ -f "$1" ]]; then
-    nmusic_mpv "$1" --input-conf=<(echo "> quit 10")
-    [[ $? == "10" ]] && nmusic_mpv shuffle "$(dirname "$1")"
+    nmusic_mpv "$1" --input-conf=<(echo "> quit")
+    [[ $? != "4" ]] && nmusic_mpv shuffle "$(dirname "$1")"
   fi
 }
 

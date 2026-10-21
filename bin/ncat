@@ -1,3 +1,20 @@
 #!/usr/bin/env bash
+ 
+root="$HOME/nutils/bin"
+
+case "$1" in
+  nutils)
+    {
+      for i in "$root"/*; do
+        util_name="$(basename "$i")"
+        echo "$util_name"
+        echo
+        echo "$(cat "$root/$util_name")"
+        echo
+      done
+    }
+
+    exit 0
+esac
 
 cat "$(command -v "$@")" 2>/dev/null || cat "$@"
