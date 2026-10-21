@@ -57,9 +57,9 @@
 ## Installation & Setup
 
 #### Run:
-`git clone https://github.com/nerdling256/nutils.git`
+`git clone https://github.com/prithvie256/nutils.git`
 #### Or:
-`git clone https://gitlab.com/nerdling256/nutils.git`
+`git clone https://gitlab.com/prithvie256/nutils.git`
 
 #### Then, all you have to do is manually run the nup script once with:
 `~/nutils/bin/nup`
