@@ -8,6 +8,8 @@
 
 ### nup
 
+# DISCLAIMER: nup is VERY early and since I built it for CachyOS, it will stay made for CachyOS for the foreseeable future. Also, ONLY run this on a fresh install of CachyOS unless you want your current config to be overridden.
+
 #### nup is a clean and deterministic system manager. The way it works is just "run things in order perfectly every time with failsaves for any errors/null values". Currently, it manages packages, dotfiles, services and more. You can imagine it like NixOS but I like this better because it's rawer. And yes, NixOS IS what made me make nup.
 
 ### ngame
@@ -63,6 +65,12 @@
 
 #### Then, all you have to do is manually run the nup script once with:
 `~/nutils/bin/nup`
+### Or, if you aren't on CachyOS:
+```
+cat << EOF >> ~/.bashrc
+export PATH="$selfdir:$PATH"
+EOF  
+```
 #### And you are done!
 
 ## Overall

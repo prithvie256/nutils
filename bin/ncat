@@ -4,6 +4,9 @@ root="$HOME/nutils/bin"
 
 case "$1" in
   nutils)
+    echo "nutils"
+    echo
+    
     {
       for i in "$root"/*; do
         util_name="$(basename "$i")"
@@ -15,6 +18,13 @@ case "$1" in
     }
 
     exit 0
+    ;;
+
+  packages)
+    cat ~/nutils/config/nup_packages.sh
+
+    exit 0
+    ;;
 esac
 
 cat "$(command -v "$@")" 2>/dev/null || cat "$@"

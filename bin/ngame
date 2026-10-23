@@ -194,6 +194,7 @@ nerdling_run() {
       shift
       detach mame -rompath "$arcade;$mame/bios" "$@"
       return
+      ;;
   esac
 
   file="$(realpath "$1" 2>/dev/null)"
@@ -282,6 +283,7 @@ nerdling_run() {
     *)
       chmod +x "$file" &>/dev/null
       detach "$file" "$@"
+      ;;
   esac
 }
 
@@ -346,6 +348,7 @@ steam_list() {
     case "$installdir" in
       *proton*|*sdk*|*redist*|*dedicated*|*steamvr*|*steamworks*|*editor*|*modkit*|*tools*|*soundtrack*|*runtime*)
         continue
+        ;;
     esac
 
     name="$(grep -oP '"name"\s+"\K[^"]+' "$f" 2>/dev/null)"
@@ -461,6 +464,7 @@ resolve_platform_type() {
 
     "Doom")
       game_type="$( { echo -e "IWAD(s)\tiwads"; echo -e "PWAD(s)\tpwads"; } | ngame_fzf two)"
+      ;;
   esac
 
   [[ -z "$game_type" ]] && return
@@ -507,7 +511,7 @@ ngame_move() {
   case "$platform" in
     "Native") game_dir="$native" ;;
     "Windows") game_dir="$windows" ;;
-    "Doom") game_dir="$doom"
+    "Doom") game_dir="$doom" ;;
   esac
 
   platform_case_partial "$platform"
@@ -556,6 +560,7 @@ picker() {
 
             "$windows"/*)
               game_nav game_dir_list "$game" windows_exe_list || continue
+              ;;
           esac
 
           [[ -d "$doom3/$game" ]] && nerdling_run doom3 "$game" && break 2
@@ -638,6 +643,7 @@ picker() {
         game_entries() { game_entry "$game_dir"; }
         game_sort game_entry "$game_dir"
         [[ "$game" == "Random" ]] && random
+        ;;
     esac
 
     [[ -z "$game" ]] && continue
@@ -699,4 +705,5 @@ case "$1" in
     
   *)
     nerdling_run "$@"
+    ;;
 esac
