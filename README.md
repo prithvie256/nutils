@@ -8,7 +8,7 @@
 
 ### nup
 
-# DISCLAIMER: nup is VERY early and since I built it for CachyOS, it will stay made for CachyOS for the foreseeable future. Also, ONLY run this on a fresh install of CachyOS unless you want your current config to be overridden.
+# DISCLAIMER: nup is VERY early in development and since I built it for CachyOS, it will stay made for CachyOS for the foreseeable future. Also, ONLY run this on a fresh install of CachyOS unless you want your current config to be overridden.
 
 #### nup is a clean and deterministic system manager. The way it works is just "run things in order perfectly every time with failsaves for any errors/null values". Currently, it manages packages, dotfiles, services and more. You can imagine it like NixOS but I like this better because it's rawer. And yes, NixOS IS what made me make nup.
 
