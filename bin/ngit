@@ -104,7 +104,7 @@ case "$1" in
     fi
 
     for r in "${remotes[@]}"; do
-      git push --quiet "$r" >/dev/null
+      git push -u --quiet "$r" >/dev/null
     done
   
     echo "Changes pushed!"

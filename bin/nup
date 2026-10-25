@@ -166,6 +166,9 @@ input_border_color = "#505050"
 header_title_color = "#505050"
 
 terminal_launcher = "foot"
+
+[app_launcher]
+icon_mode = "none"
 EOF
 
 cat << 'EOF' > ~/.config/foot/foot.ini
@@ -212,6 +215,7 @@ EOF
 
 cat << EOF >> ~/.bashrc
 export PATH="$selfdir:$HOME/.opencode/bin:$PATH"
+alias nu="cd $HOME/nutils"
 alias nd="cd $data"
 alias ng="cd $data/ngame"
 alias nf="cd $data/nfile"
@@ -226,6 +230,7 @@ alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 alias hx="helix"
 alias nbrowse="zen-browser"
+alias nu="cd $HOME/nutils"
 alias nd="cd $data"
 alias ng="cd $data/ngame"
 alias nf="cd $data/nfile"

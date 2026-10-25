@@ -39,7 +39,6 @@ packages=(
   "flips" "mame-tools"
   "nodejs" "npm"
   "rtorrent"
-  "flatpak" "auto_sober"
 )
 
 games=(
