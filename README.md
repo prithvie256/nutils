@@ -132,8 +132,9 @@ Then, if you're using nup (read the "Compatibility" section in nup's explanation
 If not:
 
 ```
-cat << EOF >> ~/.bashrc
+cat << 'EOF' >> ~/.bashrc
 export PATH="$HOME/nutils/bin:$PATH"
+EOF
 ```
 
 And you're ready to go!

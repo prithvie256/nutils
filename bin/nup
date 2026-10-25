@@ -214,7 +214,7 @@ PS1='\[\e[1;32m\][\u@\h \W]\$\[\e[0m\] '
 EOF
 
 cat << EOF >> ~/.bashrc
-export PATH="$selfdir:$HOME/.opencode/bin:$PATH"
+export PATH="$selfdir:$HOME/.opencode/bin:\$PATH"
 alias nu="cd $HOME/nutils"
 alias nd="cd $data"
 alias ng="cd $data/ngame"
