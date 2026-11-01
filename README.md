@@ -87,6 +87,8 @@ Should work on any Linux system.
 ### nedit uses the same concept as ncat but:
 Instead of listing the contents of a chosen file, it edits them. Simple as that.
 
+nedit also has a "packages" flag that edits the nup package list.
+
 ### Compatibility:
 Uses the Helix text editor explicitly, but this is easily fixed with a quick peek inside the code. Just replace `helix` with the text editor you use.
 
