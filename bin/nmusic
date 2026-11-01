@@ -2,9 +2,9 @@
 
 root="$HOME/nutils-data/nmusic"
 
-all="$root/All"
+other="$root/Other"
 
-mkdir -p "$all"
+mkdir -p "$other"
 
 folder_list="$(fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
 
@@ -25,7 +25,7 @@ download() {
   echo
 
   playlist="$(yt-dlp --flat-playlist --print "%(title)s|%(webpage_url)s" "$2" 2>/dev/null)"
-  mapfile -t files < <(fd . "$all" -e mp3)
+  mapfile -t files < <(fd . "$other" -e mp3)
   
   echo "$playlist" | while IFS='|' read -r song url; do
     found=0
@@ -47,7 +47,7 @@ download() {
     if [[ "$found" == 0 ]]; then
       yellow "Downloading $song..."
       echo
-      yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$all/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
+      yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$other/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
     fi
   done
 
@@ -102,7 +102,7 @@ picker() {
 
   while true; do
     clear
-    folder="$(echo "$folder_list" | nmusic_fzf two)"
+    folder="$( { echo -e "All\t$root"; echo "$folder_list"; } | nmusic_fzf two)"
   
     [[ -z "$folder" ]] && break
 

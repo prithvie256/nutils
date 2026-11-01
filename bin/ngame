@@ -21,6 +21,9 @@ mesen_exe="$mesen/mesen"
 jgenesis="$emulators_folder/jgenesis"
 jgenesis_exe="$jgenesis/jgenesis.AppImage"
 
+duckstation="$emulators_folder/duckstation"
+duckstation_exe="$duckstation/duckstation.AppImage"
+
 eden="$emulators_folder/eden"
 
 games_folder="$root/games"
@@ -203,7 +206,7 @@ nerdling_run() {
   cd "$(dirname "$file")" || return
   
   case "$file" in
-    "$windows"/*|*.exe)
+    "$windows"/*|*.exe|*.cmd|*.bat)
       mkdir -p "$proton_env"
       detach env STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam" STEAM_COMPAT_DATA_PATH="$proton_env" "$steamrt4" -- "$proton" run "$file" "$@"
       sleep 2
@@ -265,7 +268,7 @@ nerdling_run() {
       ;;
       
     "$ps1"/*)
-      detach duckstation-qt -nogui -batch -fullscreen "$file" "$@"
+      detach "$duckstation_exe" -nogui -batch -fullscreen "$file" "$@"
       ;;
 
     "$ps2"/*)

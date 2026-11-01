@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 
+case "$1" in
+  packages)
+    helix ~/nutils/config/nup_packages.sh
+    exit 0
+    ;;
+esac
+
 helix "$(command -v "$1" || echo "$1")"

@@ -38,7 +38,7 @@ packages=(
   "wiiudownloader-bin"
   "flips" "mame-tools"
   "nodejs" "npm"
-  "rtorrent"
+  "extract-xiso-git"
 )
 
 games=(
@@ -46,12 +46,11 @@ games=(
 )
 
 ngame_deps=(
-  "fuse2" "openssl-1.1" "dotnet-sdk-bin"
+  "fuse2" "openssl-1.1" "dotnet-sdk-bin" "gamescope" "lib32-gamescope"
   "mame" "mgba-qt" "snes9x-gtk" "simple64" "dolphin-emu" "melonds"
   "azahar-appimage-wayland" "cemu-bin" "eden-bin"
-  "flycast-bin" "duckstation-preview-latest-bin"
-  "pcsx2" "ppsspp" "rpcs3-bin" "uzdoom" "dhewm3" "ironwail" "yamagi-quake2"
-  "quake3e-git"
+  "flycast-bin" "pcsx2" "ppsspp" "rpcs3-bin" "uzdoom" "dhewm3"
+  "ironwail" "yamagi-quake2" "quake3e-git"
 )
 
 nmusic_deps=(

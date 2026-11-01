@@ -1,5 +1,7 @@
 # *DISCLAIMER: nutils is very early in development and it's primarily built for my machine. Elaboration for everything will reside in the "Compatibility" section of each tool below. Read them before running anything unless you like surprises.*
 
+# *HEADS UP: At the bottom of this README, there is a to-do section. Read it to know what's missing in the current version of the toolkit and what to expect.*
+
 # What is nutils?
 
 ### nutils is a toolkit that consists of a bunch of utilities, big and small, that I use frequently.
@@ -138,3 +140,8 @@ EOF
 ```
 
 And you're ready to go!
+
+# To-Do
+- Separate user controlled values from actual code. This one's a big one because there has been some progress to do this, but not everything is separated so far.
+- Add-on to first item: keep config files in the same place as nutils-data so that the code seen on GitHub and GitLab isn't actual user config.
+- Make nup fully distro agnostic. This is one that will take a LONG time, and I don't know when or if it'll ever be done.
