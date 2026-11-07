@@ -76,7 +76,7 @@ Native games reside in `~/nutils-data/ngame/games/native`.
 
 Windows games reside in `~/nutils-data/ngame/games/windows`.
 
-For the best experience in Windows games, install Proton Experimental from Steam.
+For Windows games, Proton Experimental from Steam is **NEEDED**.
 
 If you want to play Doom, Doom 3, Quake, Quake 2 or Quake 3 and their mods, you can put their corresponding folders in their respective directories in:
 
@@ -184,6 +184,11 @@ From You:
 
 Read the `Setup` section in this page to find out what you need to provide to have the full ngame experience.
 
+From Steam:
+
+- Proton Experimental
+- Steam Linux Runtime 4.0
+
 From Pacman/AUR:
 
 - steam (Needed to run Windows games with Proton and, obviously, Steam games.)
@@ -211,5 +216,5 @@ From Pacman/AUR:
 
 ### Compatibility
 
-It should be apparent by now that ngame is also primarily for CachyOS/Arch. The dependencies are all Pacman or AUR packages, and while you CAN install your distro's equivalent,
+It should be apparent by now that ngame is also primarily for CachyOS/Arch. The dependencies are almost all Pacman or AUR packages, and while you CAN install your distro's equivalent,
 nothing's guaranteed to work on a different distro.
