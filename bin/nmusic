@@ -8,20 +8,28 @@ mkdir -p "$other"
 
 folder_list="$(fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
 
+green() {
+  echo -e "\033[32m$1\033[0m"
+}
+
 yellow() {
   echo -e "\033[33m$1\033[0m"
 }
 
-green() {
-  echo -e "\033[32m$1\033[0m"
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
 }
 
 pink() {
   echo -e "\033[38;5;13m$1\033[0m"
 }
 
-download() {
-  yellow "Downloading... (this will take some time if it's a playlist ((especially a big one)), so go do something to kill time!)"
+nmusic_download() {
+  blue "Downloading... (this will take some time if it's a playlist ((especially a big one)), so go do something to kill time!)"
   echo
 
   playlist="$(yt-dlp --flat-playlist --print "%(title)s|%(webpage_url)s" "$2" 2>/dev/null)"
@@ -45,7 +53,7 @@ download() {
     done
   
     if [[ "$found" == 0 ]]; then
-      yellow "Downloading $song..."
+      blue "Downloading $song..."
       echo
       yt-dlp --extractor-args "youtube:player_client=web_embedded" -o "$other/%(title)s.%(ext)s" -x --audio-format mp3 --no-windows-filenames "$url" &>/dev/null
     fi
@@ -57,7 +65,9 @@ download() {
 
 nerdling_music() {
   if [[ -d "$1" ]]; then
-    read -p "Shuffle? [y/n] " ans
+    yellow "Shuffle? [y/n] "
+    read ans
+    
     echo
     
     if [[ "$ans" == "y" || -z "$ans" ]]; then
@@ -94,7 +104,7 @@ nmusic_fzf() {
 nmusic_mpv() {
   shuffle=""
   [[ "$1" == "shuffle" ]] && { shuffle="--shuffle"; shift; }
-  mpv --msg-level=cplayer=warn --term-status-msg='Playing: ${filename} [${percent-pos}%]' $shuffle "$@"
+  mpv --msg-level=cplayer=warn --term-status-msg='Playing: ${filename/no-ext} [${percent-pos}%]' $shuffle "$@"
 }
 
 picker() {
@@ -117,14 +127,32 @@ picker() {
   printf '\e]112\e\\' >&2
 }
 
+nmusic_help() {
+  echo
+  blue "nmusic"
+  blue "Usage: nmusic [command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  cyan " download [YouTube Song/Playlist URL] - Use yt-dlp to download a song/playlist"
+  cyan " list - List all songs in nmusic's root folder"
+  blue " No flags = nmusic's interactive music picker"
+  echo
+}
+
 if [[ -z "$1" ]]; then
   picker
   exit 0
 fi
 
 case "$1" in
+  help|--help|-h)
+    nmusic_help
+    exit 0
+    ;;
+    
   download)
-    download "$@"
+    nmusic_download "$@"
     ;;
   list)
     fd . "$root" -e mp3 -x printf "%s\n" "{/.}"

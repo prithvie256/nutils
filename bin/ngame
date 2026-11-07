@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
 shopt -s nullglob
-[[ -t 1 ]] && clear
 
 root="$HOME/nutils-data/ngame"
 
 mkdir -p "$root"
 
-proton="$HOME/.steam/steam/steamapps/common/Proton - Experimental/proton"
 proton_env="$root/environments/proton"
+proton="$HOME/.steam/steam/steamapps/common/Proton - Experimental/proton"
 steamrt4="$HOME/.steam/steam/steamapps/common/SteamLinuxRuntime_4/run"
 
 emulators_folder="$root/emulators"
@@ -23,6 +22,8 @@ jgenesis_exe="$jgenesis/jgenesis.AppImage"
 
 duckstation="$emulators_folder/duckstation"
 duckstation_exe="$duckstation/duckstation.AppImage"
+
+pcsx2="$emulators_folder/pcsx2"
 
 eden="$emulators_folder/eden"
 
@@ -60,6 +61,12 @@ psp="$emulated/psp"
 ps3="$emulated/ps3"
 
 folders=(
+  "$mame/bios"
+  "$mesen/bios"
+  "$jgenesis/bios"
+  "$duckstation/bios"
+  "$pcsx2/bios"
+  "$eden/keys"
   "$eden/updates"
   "$eden/dlcs"
   "$native"
@@ -141,12 +148,24 @@ sudo_check() {
   fi
 }
 
-yellow() {
-  echo -e "\033[33m$1\033[0m"
+red() {
+  echo -e "\033[31m$1\033[0m"
 }
 
 green() {
   echo -e "\033[32m$1\033[0m"
+}
+
+yellow() {
+  echo -e "\033[33m$1\033[0m"
+}
+
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
 }
 
 detach() {
@@ -157,7 +176,7 @@ detach() {
   fi
 }
 
-nerdling_run() {    
+ngame_run() {    
   if [[ ! -f "$1" ]] && command -v "$1" &>/dev/null; then
     detach sh -c "$@"
     sleep 0.1
@@ -526,7 +545,7 @@ ngame_move() {
   fi
 
   for file in "${files[@]}"; do
-    yellow "Moving $file to $game_dir in the $game_type folder..."
+    blue "Moving $file to $game_dir in the $game_type folder..."
     echo
     mv "$file" "$game_dir/$game_type"
   done
@@ -566,11 +585,11 @@ picker() {
               ;;
           esac
 
-          [[ -d "$doom3/$game" ]] && nerdling_run doom3 "$game" && break 2
-          [[ -d "$quake/$game" ]] && nerdling_run quake "$game" && break 2
-          [[ -d "$quake2/$game" ]] && nerdling_run quake2 "$game" && break 2
-          [[ -d "$quake3/$game" ]] && nerdling_run quake3 "$game" && break 2
-          [[ -f "$arcade/$game.zip" ]] && nerdling_run arcade "$game" && break 2
+          [[ -d "$doom3/$game" ]] && ngame_run doom3 "$game" && break 2
+          [[ -d "$quake/$game" ]] && ngame_run quake "$game" && break 2
+          [[ -d "$quake2/$game" ]] && ngame_run quake2 "$game" && break 2
+          [[ -d "$quake3/$game" ]] && ngame_run quake3 "$game" && break 2
+          [[ -f "$arcade/$game.zip" ]] && ngame_run arcade "$game" && break 2
          
           break
         done
@@ -584,7 +603,7 @@ picker() {
         
       Native)
         clear
-        yellow "Disclaimer: \nIf your native games aren't listed, play the game at least once \nOR make it an executable with chmod +x."
+        red "Disclaimer: \nIf your native games aren't listed, play the game at least once \nOR make it an executable with chmod +x."
 
         echo
       
@@ -613,7 +632,7 @@ picker() {
           [[ "$game" == "Random" ]] && break
         
           mods="$( { echo "None"; fd . "$doom/pwads" -x printf "%s\t%s\n" "{/.}" "{}"; } | ngame_fzf multi two)" || continue
-          nerdling_run "$game" $mods
+          ngame_run "$game" $mods
           break 2
         done
         ;;
@@ -623,7 +642,7 @@ picker() {
         game_sort folder_list "$game_dir" relative || continue
         [[ "$game" == "Random" ]] && random
         
-        nerdling_run "$game_cmd" "$game"
+        ngame_run "$game_cmd" "$game"
         break
         ;;
 
@@ -632,7 +651,7 @@ picker() {
         game_sort game_entry "$game_dir" relative || continue
         [[ "$game" == "Random" ]] && random
         
-        nerdling_run "$game_cmd" "$game"
+        ngame_run "$game_cmd" "$game"
         break
         ;;
 
@@ -657,27 +676,75 @@ picker() {
   printf '\e]112\e\\' >&2
 }
 
+ngame_help() {
+  echo
+  blue "ngame"
+  blue "Usage: ngame [game|command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  cyan " setup - Automatically create needed folders and files"
+  cyan " platforms - List all platforms that ngame supports"
+  cyan " list - List all games detected by ngame"
+  cyan " move [files(s)] - Opens an fzf picker to choose which platform folder to move the file(s) to"
+  cyan " random - Starts a random game from the supported list"
+  blue " No flags = ngame's interactive game picker"
+  echo
+  blue "Platforms:"
+  cyan " Native, Steam, Windows, Doom, Doom 3, Quake 1-3, Arcade, NES, Game Boy, SNES,"
+  cyan " N64, GBC, GBA, GameCube, NDS, Wii, 3DS, Wii U, Switch, Genesis, Dreamcast,"
+  cyan " PS1, PS2, PSP, PS3"
+  echo
+}
+
+ngame_setup() {
+  blue "Setting up directories..."
+  mkdir -p "${folders[@]}"
+
+  cat << EOF > "$root/.fdignore"
+*.ramc
+*.srm
+*.sav
+*.ss1
+*.undo
+*.000
+*.log
+*.ini
+EOF
+
+  touch "$root/emulators/duckstation/portable.txt"
+
+  echo
+  blue "Setting up config..."
+  mkdir -p ~/.config/mupen64plus
+  sed -i "s/Fullscreen = False/Fullscreen = True/g" "$HOME/.config/mupen64plus/mupen64plus.cfg" &>/dev/null
+
+  echo
+  green "Setup complete!"
+  echo
+
+  touch "$root/first_run_done.txt"
+}
+
 if [[ -z "$1" ]]; then
+  [[ ! -f "$root/first_run_done.txt" ]] && ngame_setup && exit 0
   pick=1
   picker
-  nerdling_run "$game"
+  ngame_run "$game"
 fi
 
 case "$1" in
-  setup)
-    yellow "Setting up directories..."
-    mkdir -p "${folders[@]}"
-
-    echo
-    yellow "Setting up config..."
-    mkdir -p ~/.config/mupen64plus
-    sed -i "s/Fullscreen = False/Fullscreen = True/g" "$HOME/.config/mupen64plus/mupen64plus.cfg" &>/dev/null
-
-    echo
-    green "Setup complete!"
-    echo
-
+  help|--help|-h)
+    ngame_help
     exit 0
+    ;;
+esac
+
+[[ -t 1 ]] && clear
+
+case "$1" in    
+  setup)
+    ngame_setup
     ;;
     
   platforms)
@@ -703,10 +770,10 @@ case "$1" in
   random)
     game_entries() { game_entry_all; }
     random
-    nerdling_run "$game"
+    ngame_run "$game"
     ;;
     
   *)
-    nerdling_run "$@"
+    ngame_run "$@"
     ;;
 esac

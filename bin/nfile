@@ -1,10 +1,39 @@
 #!/usr/bin/env bash
 
+green() {
+  echo -e "\033[32m$1\033[0m"
+}
+
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
+}
+
+nfile_help() {
+  echo
+  blue "nfile"
+  blue "Usage: nfile [command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  echo
+}
+
+case "$1" in
+  help|--help|-h)
+    nfile_help
+    exit 0
+    ;;
+esac
+
 root="$HOME/nutils-data/nfile"
 
 mkdir -p "$root"
 
 "$@" > "$root"/out.txt
 
-echo "Created file in ~/nutils-data/nfile/out.txt."
+green "Created file in ~/nutils-data/nfile/out.txt."
 echo

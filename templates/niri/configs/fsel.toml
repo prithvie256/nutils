@@ -1,0 +1,14 @@
+main_text_color = "#505050"
+apps_text_color = "#505050"
+input_text_color = "#505050"
+
+main_border_color = "#505050"
+apps_border_color = "#505050"
+input_border_color = "#505050"
+
+header_title_color = "#505050"
+
+terminal_launcher = "foot"
+
+[app_launcher]
+icon_mode = "none"

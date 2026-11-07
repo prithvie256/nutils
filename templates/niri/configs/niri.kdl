@@ -1,0 +1,83 @@
+prefer-no-csd
+
+layout {
+  gaps 10
+  background-color "1c1c21"
+
+  focus-ring {
+    off
+  }
+
+  border {
+    off
+  }
+  shadow {
+    on
+  }
+}
+
+overview {
+  backdrop-color "16161a"
+}
+
+window-rule {
+  open-maximized true
+}
+
+cursor {
+  xcursor-theme "Bibata-Modern-Classic"
+  xcursor-size 24
+}
+
+input {
+  keyboard {
+    repeat-delay 250
+    repeat-rate 40
+  }
+}
+
+binds {
+  "Super+Up" { focus-workspace-up; }
+  "Super+Down" { focus-workspace-down; }
+  "Super+Left" { focus-column-left; }
+  "Super+Right" { focus-column-right; }
+
+  "Super+w" { toggle-overview; }
+  "Super+e" { spawn "foot" "bash" "-ic" "clifm"; }
+  "Super+s" { spawn "sh" "-c" "grim  - | swappy -f -"; }
+  "Super+f" { fullscreen-window; }
+  "Super+v" { toggle-window-floating; }
+  "Super+a" { maximize-column; }
+  "Super+t" { spawn "foot"; }
+  "Super+d" { spawn "foot" "--app-id=float" "fsel" "-d"; }
+  "Super+q" { close-window; }
+  
+  "Super+Shift+e" { spawn "foot" "bash" "-ic" "nmusic"; }
+  "Super+Shift+s" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -"; }
+  "Super+Shift+d" { spawn "foot" "--app-id=float" "bash" "-ic" "ngame"; }
+  "Super+Shift+t" { spawn "foot" "--app-id=float"; }
+  "Super+Shift+q" { quit; }
+
+  XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+  XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+  XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+
+  XF86MonBrightnessUp { spawn "brightnessctl" "set" "+10%"; }
+  XF86MonBrightnessDown { spawn "brightnessctl" "set" "10%-"; }
+}
+
+window-rule {
+  match app-id="float"
+  open-floating true
+}
+
+window-rule {
+  geometry-corner-radius 12
+  clip-to-geometry true
+}
+
+gestures {
+  hot-corners {
+    off
+  }
+}

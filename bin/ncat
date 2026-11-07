@@ -2,7 +2,32 @@
  
 root="$HOME/nutils/bin"
 
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
+}
+
+ncat_help() {
+  echo
+  blue "ncat"
+  blue "Usage: ncat [file|command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  cyan " nutils - Neatly cat every nutils tool"
+  cyan " packages - Show your nup package list"
+  echo  
+}
+
 case "$1" in
+  help|--help|-h)
+    ncat_help
+    exit 0
+    ;;
+
   nutils)
     echo "nutils"
     echo
@@ -10,9 +35,10 @@ case "$1" in
     {
       for i in "$root"/*; do
         util_name="$(basename "$i")"
-        echo "$util_name"
+        blue "$util_name"
         echo
-        echo "$(cat "$root/$util_name")"
+        util_content="$(cat "$i")"
+        cyan "${util_content//\\/\\\\}"
         echo
       done
     }
@@ -22,7 +48,6 @@ case "$1" in
 
   packages)
     cat ~/nutils/config/nup_packages.sh
-
     exit 0
     ;;
 esac

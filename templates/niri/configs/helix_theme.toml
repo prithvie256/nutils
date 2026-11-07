@@ -1,0 +1,7 @@
+inherits = "base16_terminal"
+
+"ui.linenr" = { bg = "default" }
+"ui.linenr.selected" = { bg = "default" }
+
+"ui.gutter" = { bg = "default" }
+"ui.gutter.selected" = { bg = "default" }

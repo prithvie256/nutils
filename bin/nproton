@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
+}
+
+nproton_help() {
+  echo
+  blue "nproton"
+  blue "Usage: nproton [windows exe|wine/proton command|command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  echo  
+}
+
+case "$1" in
+  help|--help|-h)
+    nproton_help
+    exit 0
+    ;;
+esac
+
+proton_env="$HOME/nutils-data/ngame/environments/proton"
+proton="$HOME/.steam/steam/steamapps/common/Proton - Experimental/proton"
+steamrt4="$HOME/.steam/steam/steamapps/common/SteamLinuxRuntime_4/run"
+
+STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam" STEAM_COMPAT_DATA_PATH="$proton_env" "$steamrt4" -- "$proton" run "$@"

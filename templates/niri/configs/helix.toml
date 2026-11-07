@@ -1,0 +1,7 @@
+theme = "main"
+
+[editor.gutters]
+layout = ["line-numbers", "spacer", "spacer"]
+
+[editor.gutters.line-numbers]
+min-width = 1

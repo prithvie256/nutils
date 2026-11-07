@@ -1,3 +1,28 @@
 #!/usr/bin/env bash
 
+blue() {
+  echo -e "\033[34m$1\033[0m"
+}
+
+cyan() {
+  echo -e "\033[36m$1\033[0m"
+}
+
+ncopy_help() {
+  echo
+  blue "ncopy"
+  blue "Usage: ncopy [command]"
+  echo
+  blue "Commands:"
+  cyan " help|--help|-h - Show this help menu"
+  echo  
+}
+
+case "$1" in
+  help|--help|-h)
+    ncopy_help
+    exit 0
+    ;;
+esac
+
 "$@" | wl-copy
