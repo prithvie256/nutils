@@ -172,10 +172,12 @@ cyan() {
 }
 
 detach() {
-  if [[ "$pick" == 0 ]]; then
-    setsid -f env "${gpu_vars[@]}" "$@"
+  cmd=("-f" "env" "${gpu_vars[@]}")
+  
+  if [[ "$pick" == 1 ]]; then
+    setsid "${cmd[@]}" "$@" &>/dev/null
   else
-    setsid -f env "${gpu_vars[@]}" "$@" &>/dev/null
+    setsid "${cmd[@]}" "$@"
   fi
 }
 

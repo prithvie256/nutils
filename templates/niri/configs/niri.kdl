@@ -43,12 +43,11 @@ binds {
   "Super+Right" { focus-column-right; }
 
   "Super+w" { toggle-overview; }
-  "Super+e" { spawn "foot" "bash" "-ic" "clifm"; }
+  "Super+e" { spawn "foot"; }
   "Super+s" { spawn "sh" "-c" "grim  - | swappy -f -"; }
   "Super+f" { fullscreen-window; }
   "Super+v" { toggle-window-floating; }
   "Super+a" { maximize-column; }
-  "Super+t" { spawn "foot"; }
   "Super+d" { spawn "foot" "--app-id=float" "fsel" "-d"; }
   "Super+q" { close-window; }
   

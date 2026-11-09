@@ -14,6 +14,17 @@ data="$HOME/nutils-data"
 
 alias nu="cd $HOME/nutils"
 alias nd='cd $data'
-alias ng='cd $data/ngame'
-alias nf='cd $data/nfile'
-alias nm='cd $data/nmusic'
+alias ndu='cd $data/nup'
+alias ndg='cd $data/ngame'
+alias ndm='cd $data/nmusic'
+alias ndf='cd $data/nfile'
+
+cd() {
+  builtin cd "$@" && \
+
+  clear && \
+
+  ls -A --color=auto --group-directories-first -F
+}
+
+ls -A --color=auto --group-directories-first -F

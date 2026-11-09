@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+data="$HOME/nutils-data"
+[[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
+
+nup_data="$data/nup"
+
 blue() {
   echo -e "\033[34m$1\033[0m"
 }
@@ -26,7 +31,7 @@ case "$1" in
     ;;
     
   packages)
-    helix ~/nutils-data/nup/packages.sh
+    helix "$nup_data/packages.sh"
     exit 0
     ;;
 esac

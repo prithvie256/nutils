@@ -57,7 +57,7 @@ packages=(
   "p7zip" "aria2"
   "xorg-xwayland" "xwayland-satellite"
   "helix" "fastfetch" "openssh"
-  "fsel-bin" "clifm-bin" "zen-browser-bin"
+  "fsel-bin" "zen-browser-bin"
   "bibata-cursor-theme-bin"
 )
 
