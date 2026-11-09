@@ -107,7 +107,7 @@ nmusic_fzf() {
 nmusic_mpv() {
   shuffle=""
   [[ "$1" == "shuffle" ]] && { shuffle="--shuffle"; shift; }
-  mpv --msg-level=cplayer=warn --term-status-msg='Playing: ${filename/no-ext} [${percent-pos}%]' $shuffle "$@"
+  mpv --msg-level=cplayer=warn --term-status-msg='Playing: ${filename/no-ext} [${percent-pos}%]' --term-playing-msg=' ' $shuffle "$@"
 }
 
 picker() {

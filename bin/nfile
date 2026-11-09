@@ -38,5 +38,6 @@ mkdir -p "$nfile_data"
 
 "$@" > "$nfile_data"/out.txt
 
-green "Created file in ~/nutils-data/nfile/out.txt."
+echo
+green "The output file is in $nfile_data/out.txt."
 echo

@@ -11,6 +11,30 @@ nutils is a toolkit that consists of a bunch of Bash scripts which I personally 
 
 No. nutils will never be complete. It will keep getting improvements and additions from me.
 
+### Installation
+
+For most people, this will be enough:
+
+```
+cd ~
+git clone https://github.com/prithvie256/nutils
+```
+
+Or:
+
+```
+cd ~
+git clone https://gitlab.com/prithvie256/nutils
+```
+
+Then, if you wish to use nup, just run `~/nutils/bin/nup` and you'll have all tools in your PATH, ready to be used. If not, run this once:
+
+```
+cat << EOF >> ~/.bashrc
+export PATH="$HOME/nutils/bin:$PATH"
+EOF
+```
+
 ### Quick Setup
 
 Every tool in nutils that needs persistent data uses `~/nutils-data` by default.
