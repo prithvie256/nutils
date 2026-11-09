@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+data="$HOME/nutils-data"
+[[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
+
+nfile_data="$data/nfile"
+
 green() {
   echo -e "\033[32m$1\033[0m"
 }
@@ -29,11 +34,9 @@ case "$1" in
     ;;
 esac
 
-root="$HOME/nutils-data/nfile"
+mkdir -p "$nfile_data"
 
-mkdir -p "$root"
-
-"$@" > "$root"/out.txt
+"$@" > "$nfile_data"/out.txt
 
 green "Created file in ~/nutils-data/nfile/out.txt."
 echo

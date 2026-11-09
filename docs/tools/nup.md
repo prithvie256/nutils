@@ -48,8 +48,11 @@ nup can be used in a few ways, for example:
 - `nup help/--help/-h` shows the CLI help menu.
 - `nup quick/-q` does an nup run without touching your packages.
 - `nup automodules/-am` does an nup run that bypasses the confirmation prompt for executing modules. Good for power users.
+- `nup dry/-d` does a dry run when doing any process involving packages. Good to know what will happen to your system without committing yet.
 
-Keep in mind that the latter 2 flags can be used together in any order.
+Keep in mind that the latter 3 flags can be used together in any order.
+
+**Bonus:** `nup quick` and `nup dry` will be useless when ran together because the dry run will happen regardless.
 
 ### First Run Experience
 

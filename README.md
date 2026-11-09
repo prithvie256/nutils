@@ -4,7 +4,26 @@
 ### *For elaboration, in every nutils tool page, there will be a "Compatibility" section. Make sure to read it to know what to expect.*
 
 ### Wait, what IS nutils?!
-**nutils** is a toolkit that consists of a bunch of Bash scripts which I personally use frequently. They range from a few lines of code to hundreds.
+
+nutils is a toolkit that consists of a bunch of Bash scripts which I personally use frequently. They range from a few lines of code to hundreds.
+
+### Is nutils complete?
+
+No. nutils will never be complete. It will keep getting improvements and additions from me.
+
+### Quick Setup
+
+Every tool in nutils that needs persistent data uses `~/nutils-data` by default.
+If you'd like to change this:
+
+```
+mkdir -p ~/.config/nutils
+cd ~/.config/nutils
+```
+
+Once you're there, create a file called `env.conf`, and in there, create a variable called `data` and the value should be where you want your data to be. For example:
+
+`data=$HOME/stuff`
 
 ### Directory:
 

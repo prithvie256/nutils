@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
- 
-root="$HOME/nutils/bin"
+
+selfdir="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
 
 blue() {
   echo -e "\033[34m$1\033[0m"
@@ -33,7 +33,7 @@ case "$1" in
     echo
     
     {
-      for i in "$root"/*; do
+      for i in "$selfdir"/*; do
         util_name="$(basename "$i")"
         blue "$util_name"
         echo

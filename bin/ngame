@@ -2,15 +2,18 @@
 
 shopt -s nullglob
 
-root="$HOME/nutils-data/ngame"
+data="$HOME/nutils-data"
+[[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
 
-mkdir -p "$root"
+ngame_data="$data/ngame"
 
-proton_env="$root/environments/proton"
+mkdir -p "$ngame_data"
+
+proton_env="$ngame_data/environments/proton"
 proton="$HOME/.steam/steam/steamapps/common/Proton - Experimental/proton"
 steamrt4="$HOME/.steam/steam/steamapps/common/SteamLinuxRuntime_4/run"
 
-emulators_folder="$root/emulators"
+emulators_folder="$ngame_data/emulators"
 
 mame="$emulators_folder/mame"
 
@@ -27,7 +30,7 @@ pcsx2="$emulators_folder/pcsx2"
 
 eden="$emulators_folder/eden"
 
-games_folder="$root/games"
+games_folder="$ngame_data/games"
 ports="$games_folder/ports"
 emulated="$games_folder/emulated"
 
@@ -701,7 +704,7 @@ ngame_setup() {
   blue "Setting up directories..."
   mkdir -p "${folders[@]}"
 
-  cat << EOF > "$root/.fdignore"
+  cat << EOF > "$ngame_data/.fdignore"
 *.ramc
 *.srm
 *.sav
@@ -712,7 +715,7 @@ ngame_setup() {
 *.ini
 EOF
 
-  touch "$root/emulators/duckstation/portable.txt"
+  touch "$ngame_data/emulators/duckstation/portable.txt"
 
   echo
   blue "Setting up config..."
@@ -723,11 +726,11 @@ EOF
   green "Setup complete!"
   echo
 
-  touch "$root/first_run_done.txt"
+  touch "$ngame_data/first_run_done.txt"
 }
 
 if [[ -z "$1" ]]; then
-  [[ ! -f "$root/first_run_done.txt" ]] && ngame_setup && exit 0
+  [[ ! -f "$ngame_data/first_run_done.txt" ]] && ngame_setup && exit 0
   pick=1
   picker
   ngame_run "$game"

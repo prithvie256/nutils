@@ -3,7 +3,10 @@
 shopt -s globstar
 
 nutils="$HOME/nutils"
+
 data="$HOME/nutils-data"
+[[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
+
 nup_data="$data/nup"
 selfdir="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
 
@@ -67,6 +70,60 @@ nup_packages() {
     sudo pacman -Rns --noconfirm $(pacman -Qdtq) &>/dev/null
     echo
   fi
+}
+
+nup_packages_dry() {
+  source "$nup_data/packages.sh"
+
+  whitelist=(
+    "${essentials[@]}" "${packages[@]}" "${games[@]}"
+    "${nutils_deps[@]}" "${ngame_deps[@]}" "${nmusic_deps[@]}"
+  )
+
+  blue "Packages that would be installed:"
+  echo
+  to_install=$(pacman -T "${whitelist[@]}")
+
+  if [[ -z "$to_install" ]]; then
+    cyan "None"
+  else
+    cyan "$to_install"
+  fi
+
+  echo
+  blue "Packages that would be purged:"
+  to_purge=$(comm -23 <(pacman -Qqe | sort) <(printf "%s\n" "${whitelist[@]}" | sort))
+  echo
+  
+  if [[ -z "$to_purge" ]]; then
+    cyan "None"
+  else
+    cyan "$to_purge"
+  fi
+
+  echo
+  blue "Packages that would be updated:"
+  to_update=$(paru -Qu)
+  echo
+  
+  if [[ -z "$to_update" ]]; then
+    cyan "None"
+  else
+    cyan "$to_update"
+  fi
+
+  echo
+  blue "Orphaned packages that would be removed:"
+  orphan=$(pacman -Qdtq)
+  echo
+  
+  if [[ -z "$orphan" ]]; then
+    cyan "None"
+  else
+    cyan "$orphan"
+  fi
+
+  echo
 }
 
 nup_config() {
@@ -146,7 +203,8 @@ nup_help() {
   blue "Commands:"
   cyan " help|--help|-h - Show this help menu"
   cyan " quick|-q - Doesn't execute anything to do with packages"
-  cyan " automodules|-am - Bypasses confirmation prompt when executing modules"
+  cyan " automodules|-am - Bypass confirmation prompt when executing modules"
+  cyan " dry|-d - Dry run anything to do with packages"
   blue " No flags = a normal nup run"
   echo
 }
@@ -183,6 +241,9 @@ for i in "$@"; do
     automodules|-am)
       auto_modules=1
       ;;
+
+    dry|-d)
+      dry_run=1
   esac
 done
 
@@ -197,7 +258,13 @@ clear
 
 nup_setup
 nup_start
-nup_packages
+
+if [ "$dry_run" == 1 ]; then
+  nup_packages_dry
+else
+  nup_packages
+fi
+
 nup_config
 nup_modules
 nup_essential

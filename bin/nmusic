@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
-root="$HOME/nutils-data/nmusic"
+data="$HOME/nutils-data"
+[[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
 
-other="$root/Other"
+nmusic_data="$data/nmusic"
+
+other="$nmusic_data/Other"
 
 mkdir -p "$other"
 
-folder_list="$(fd . "$root" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
+folder_list="$(fd . "$nmusic_data" -t d -x printf "%s\t%s\n" "{/.}" "{}")"
 
 green() {
   echo -e "\033[32m$1\033[0m"
@@ -112,7 +115,7 @@ picker() {
 
   while true; do
     clear
-    folder="$( { echo -e "All\t$root"; echo "$folder_list"; } | nmusic_fzf two)"
+    folder="$( { echo -e "All\t$nmusic_data"; echo "$folder_list"; } | nmusic_fzf two)"
   
     [[ -z "$folder" ]] && break
 
@@ -155,7 +158,7 @@ case "$1" in
     nmusic_download "$@"
     ;;
   list)
-    fd . "$root" -e mp3 -x printf "%s\n" "{/.}"
+    fd . "$nmusic_data" -e mp3 -x printf "%s\n" "{/.}"
     ;;
   *)
     nerdling_music "$@"
