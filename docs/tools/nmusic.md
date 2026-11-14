@@ -12,7 +12,7 @@ which is in nmusic's root folder. It treats each folder under its root as playli
 control over what songs are in what playlist. The only exception is nmusic always downloads your songs into the `Other` folder
 which shouldn't be much of a problem.
 
-Its main interface is very similar to ngame, it:
+nmusic's main interface is very similar to ngame. It:
 
 - Utilizes fd to both scan your playlists and scan the entire root folder recursively for the "All" option.
 - Uses fzf to let you choose either your playlist or browse all songs, and play a single one or all of them.
@@ -43,6 +43,14 @@ Then, when you run nmusic, you will see a clean fzf interface such as:
 ![nmusic's Interface](../../media/images/nmusic_interface.png)
 
 Then, you can start listening to your songs!
+
+### Controls
+
+- `>/<` - Next/Previous song.
+- `9` or `/` - Lower volume.
+- `0` or `*` - Increase volume.
+- Right Arrow/Left Arrow - 5 seconds Forwards/Backwards.
+- Up Arrow/Down Arrow - 1 minute Forwards/Backwards.
 
 ### Dependencies
 

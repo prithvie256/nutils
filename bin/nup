@@ -8,7 +8,7 @@ data="$HOME/nutils-data"
 [[ -f "$HOME/.config/nutils/env.conf" ]] && source "$HOME/.config/nutils/env.conf"
 
 nup_data="$data/nup"
-selfdir="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
+selfdir="$(cd -- "$(dirname -- "${BASH_SOURCE}")" && pwd)"
 
 green() {
   echo -e "\033[32m$1\033[0m"
@@ -126,11 +126,13 @@ nup_packages_dry() {
   echo
 }
 
-nup_config() {
+nup_paths() {
   blue "Creating configurations..."
 
-  for i in "$nup_data/paths"/**; do
-    [[ "$i" == *.conf ]] || continue
+  for i in "$nup_data/paths"/**/*.conf; do
+    [[ ! -f "$i" ]] && continue
+    filedir="$(cd -- "$(dirname -- "$i")" && pwd)"
+  
     echo
     blue "Sourcing $i..."
     [[ -f "$i" ]] && source "$i"
@@ -148,12 +150,12 @@ nup_config() {
 nup_modules() {
   blue "Executing modules..."
 
-  for i in "$nup_data/modules"/**; do
-    [[ "$i" == *.sh ]] || continue
-    echo
-    blue "Module: $(basename "$i")"
-
+  for i in "$nup_data/modules"/**/*.sh; do
+    [[ ! -f "$i" ]] && continue
+    
     if [[ "$auto_modules" != 1 ]]; then
+      echo
+      blue "Module: $(basename "$i")"
       yellow "Execute? [y/n]"
       echo
       read choice
@@ -265,7 +267,7 @@ else
   nup_packages
 fi
 
-nup_config
+nup_paths
 nup_modules
 nup_essential
 nup_done

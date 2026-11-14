@@ -19,12 +19,33 @@ alias ndg='cd $data/ngame'
 alias ndm='cd $data/nmusic'
 alias ndf='cd $data/nfile'
 
-cd() {
-  builtin cd "$@" && \
-
-  clear && \
-
-  ls -A --color=auto --group-directories-first -F
+green() {
+  echo -e "\033[32m$1\033[0m"
 }
 
-ls -A --color=auto --group-directories-first -F
+cd() {
+  builtin cd "$@"
+  clear
+  
+  green "$(pwd)"
+  echo
+  
+  (
+    fd -d 1 -t d --color=always
+    fd -d 1 -t f --color=always
+    fd -d 1 -t d -H '^\.' --color=always
+    fd -d 1 -t f -H '^\.' --color=always
+  ) | column
+  
+  echo
+}
+
+.() {
+  clear
+  cd .
+}
+
+..() {
+  clear
+  cd ..
+}

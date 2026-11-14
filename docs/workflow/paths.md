@@ -4,7 +4,7 @@ Paths is a modular system I made for nup to be able to easily create your own co
 
 ### How It Works
 
-In `~/nutils-data/nup/paths`, there will be .conf files. These .conf files will have exactly 2 variables:
+In `~/nutils-data/nup/paths`, there will be .conf files. These .conf files are called Paths and will have exactly 2 variables:
 
 - target_file - The path to the configuration file in `~/nutils-data/nup/configs`.
 - destination - The path that target_file should be sent to.
@@ -13,3 +13,7 @@ I have already set up a few essential configurations using this system, so you c
 
 nup will do a for loop inside `~/nutils-data/nup/paths`, and in the loop, it will source the .conf files one by one and do the operations
 needed to copy over the configuration files.
+
+**Bonus:** Since the config files live in `~/nutils-data/nup/configs` I HIGHLY recommend you to use the variable `filedir` when defining the `target_file` variable
+so that things can stay implicit. If you were to make it explicit, then everytime you wanted to change `nutils-data`'s location, you'd have to change EVERY SINGLE
+`target_file` variable in each Path to match.

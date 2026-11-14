@@ -550,13 +550,13 @@ ngame_move() {
   fi
 
   for file in "${files[@]}"; do
-    blue "Moving $file to $game_dir in the $game_type folder..."
+    blue "Moving $file to $game_dir/$game_type..."
     echo
     mv "$file" "$game_dir/$game_type"
   done
 
   green "Done. Also this feature took WAY too long to implement LOL"
-  cd "$game_dir/$game_type" && exec clifm --no-restore-last-path
+  echo
 }
 
 random() {
