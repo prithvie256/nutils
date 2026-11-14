@@ -14,6 +14,7 @@ I have already set up a few essential configurations using this system, so you c
 nup will do a for loop inside `~/nutils-data/nup/paths`, and in the loop, it will source the .conf files one by one and do the operations
 needed to copy over the configuration files.
 
-**Bonus:** Since the config files live in `~/nutils-data/nup/configs` I HIGHLY recommend you to use the variable `filedir` when defining the `target_file` variable
+**Bonus:** Since the config files live in `~/nutils-data/nup/configs`, I HIGHLY recommend you to use
+`$filedir/../configs` instead of `$HOME/nutils-data/nup/configs` when defining the `target_file` variable
 so that things can stay implicit. If you were to make it explicit, then everytime you wanted to change `nutils-data`'s location, you'd have to change EVERY SINGLE
 `target_file` variable in each Path to match.
