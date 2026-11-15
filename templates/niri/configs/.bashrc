@@ -33,10 +33,12 @@ cd() {
   (
     fd -d 1 -t d --color=always
     fd -d 1 -t f --color=always
+    fd -d 1 -t l --color=always
     fd -d 1 -t d -H '^\.' --color=always
     fd -d 1 -t f -H '^\.' --color=always
-  ) | column
-  
+    fd -d 1 -t l -H '^\.' --color=always
+  ) | pr -4 -t -s$'\t' | column -t -s $'\t' -o '    '
+
   echo
 }
 
