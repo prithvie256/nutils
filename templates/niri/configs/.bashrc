@@ -16,6 +16,12 @@ alias nu="cd $HOME/nutils"
 alias nd='cd $data'
 alias ndu='cd $data/nup'
 alias ndg='cd $data/ngame'
+
+alias ndgn='cd $data/ngame/games/native'
+alias ndgw='cd $data/ngame/games/windows'
+alias ndgp='cd $data/ngame/games/ports'
+alias ndge='cd $data/ngame/games/emulated'
+
 alias ndm='cd $data/nmusic'
 alias ndf='cd $data/nfile'
 
